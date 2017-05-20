@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="郭晓忠" />
+
+
+
+<meta name="description" content="JavaFx+Springboot+Maven 开发打包教程, 最近在用 JavaFx 开发窗体程序，并且以后打算把所有的窗体软件切换到 JavaFx 上面，并且还想用 `springboot` 的各种好处，集成了 `springboot` 就可以愉快的用各种服务了。所以就有了这个博客。。。">
+<meta name="keywords" content="javafx,springboot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaFx+Springboot+Maven 开发打包教程">
+<meta property="og:url" content="http://blog.spartajet.com/2017/05/20/javafx-spring-boot-maven/index.html">
+<meta property="og:site_name" content="郭晓忠的博客">
+<meta property="og:description" content="JavaFx+Springboot+Maven 开发打包教程, 最近在用 JavaFx 开发窗体程序，并且以后打算把所有的窗体软件切换到 JavaFx 上面，并且还想用 `springboot` 的各种好处，集成了 `springboot` 就可以愉快的用各种服务了。所以就有了这个博客。。。">
+<meta property="og:image" content="http://ghost.guoxiaozhong.cn/2017-05-20-124621.jpg">
+<meta property="og:updated_time" content="2017-05-20T13:33:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaFx+Springboot+Maven 开发打包教程">
+<meta name="twitter:description" content="JavaFx+Springboot+Maven 开发打包教程, 最近在用 JavaFx 开发窗体程序，并且以后打算把所有的窗体软件切换到 JavaFx 上面，并且还想用 `springboot` 的各种好处，集成了 `springboot` 就可以愉快的用各种服务了。所以就有了这个博客。。。">
+<meta name="twitter:image" content="http://ghost.guoxiaozhong.cn/2017-05-20-124621.jpg">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="郭晓忠的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/logo.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>JavaFx+Springboot+Maven 开发打包教程 | 郭晓忠的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/logo.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">郭晓忠</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">机械男，程序员，前军校学员，穷逼博士。。。</p>
+        
+
+        
+
+
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/随笔">随笔</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:spartajet.guo@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/spartajet" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                                <a class="fa LinkedIn" href="https://www.linkedin.com/in/guoxiaozhong/" title="LinkedIn"></a>
+                            
+                                <a class="fa QQ" href="/1780273075" title="QQ"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">专注知识</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">郭晓忠</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/logo.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">郭晓忠</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">机械男，程序员，前军校学员，穷逼博士。。。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/随笔">随笔</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:spartajet.guo@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/spartajet" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                                <a class="fa LinkedIn" target="_blank" href="https://www.linkedin.com/in/guoxiaozhong/" title="LinkedIn"></a>
+                            
+                                <a class="fa QQ" target="_blank" href="/1780273075" title="QQ"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-javafx-spring-boot-maven" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/05/20/javafx-spring-boot-maven/" class="article-date">
+      <time datetime="2017-05-20T00:00:52.000Z" itemprop="datePublished">2017-05-20</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JavaFx+Springboot+Maven 开发打包教程
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javafx/">javafx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springboot/">springboot</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <blockquote>
+<p>最近在用 JavaFx 开发窗体程序，并且以后打算把所有的窗体软件切换到 JavaFx 上面，并且还想用 <code>springboot</code> 的各种好处，集成了 <code>springboot</code> 就可以愉快的用各种服务了。所以就有了这个博客。。。<br>我本来想自己写一个 <code>javafx-spring-boot-starter</code> 的，其原理也是很简单地，利用 <code>springboot</code>的 <code>aware</code> 就可以了。但是发现德国这哥们已经写了一个，就变懒了。哎，没办法，我真的是太懒了。<br>本次的代码Github 地址：<a href="https://github.com/spartajet/javafx-boot-demo" target="_blank" rel="external">https://github.com/spartajet/javafx-boot-demo</a></p>
+</blockquote>
+<h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p><code>javafx</code>的<code>springboot</code>支持的库，官方是没有的，开源有一大堆。我采用的是<code>springboot-javafx-support</code> 地址是：<a href="https://github.com/roskenet/springboot-javafx-support" target="_blank" rel="external">springboot-javafx-support</a> .这个库文档比较全，比较详细，文档地址：<a href="https://www.felixroske.de/page/programmierung/index.html" target="_blank" rel="external">Spring Boot and JavaFx8</a> .</p>
+<p>用<code>springboot</code>必须用<code>maven</code>，否则那简直是灾难。最重要的是打包工具。我用的是<code>JavaFX Maven Plugin</code> 地址：<a href="https://github.com/javafx-maven-plugin/javafx-maven-plugin" target="_blank" rel="external">JavaFX Maven Plugin</a></p>
+<h2 id="2-Maven-配置"><a href="#2-Maven-配置" class="headerlink" title="2. Maven 配置"></a>2. Maven 配置</h2><p>maven 主要配置依赖库和插件，具体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-log4j2&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">        &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;de.roskenet&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;springboot-javafx-support&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;springboot-javafx-support.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line">&lt;build&gt;</div><div class="line">    &lt;plugins&gt;</div><div class="line">        &lt;plugin&gt;</div><div class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</div><div class="line">        &lt;/plugin&gt;</div><div class="line">        &lt;plugin&gt;</div><div class="line">            &lt;groupId&gt;com.zenjava&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;javafx-maven-plugin&lt;/artifactId&gt;</div><div class="line">            &lt;configuration&gt;</div><div class="line">                &lt;mainClass&gt;com.spartajet.fxboot.demo.MainController&lt;/mainClass&gt;</div><div class="line">                &lt;vendor&gt;Spartajet&lt;/vendor&gt;</div><div class="line">            &lt;/configuration&gt;</div><div class="line">        &lt;/plugin&gt;</div><div class="line">    &lt;/plugins&gt;</div><div class="line">&lt;/build&gt;</div></pre></td></tr></table></figure>
+<p>其中，比较重要的是：<code>&lt;mainClass&gt;com.spartajet.fxboot.demo.MainController&lt;/mainClass&gt;</code> 这个是打包的时候的 main 类。<code>&lt;vendor&gt;Spartajet&lt;/vendor&gt;</code>是组织名称。</p>
+<h2 id="3-Javafx-集成springboot"><a href="#3-Javafx-集成springboot" class="headerlink" title="3. Javafx 集成springboot"></a>3. Javafx 集成springboot</h2><h3 id="3-1-创建-FXML-布局文件"><a href="#3-1-创建-FXML-布局文件" class="headerlink" title="3.1 创建 FXML 布局文件"></a>3.1 创建 FXML 布局文件</h3><p>可以用 <code>SceneBuilder</code> 工具创建 FXML 文件，我还是建议自己写 FXML，刚开始可能不习惯，慢慢习惯就好了。但是，<strong>我墙裂建议布局和样式分开，fxml 只管布局，css 只管样式。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;BorderPane id=&quot;mainBorderPane&quot; xmlns=&quot;http://javafx.com/javafx/8.0.111&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;com.spartajet.fxboot.demo.controller.MainStageController&quot; stylesheets=&quot;/css/MainStage.css&quot;&gt;</div><div class="line">&lt;/BorderPane&gt;</div></pre></td></tr></table></figure>
+<h3 id="3-2-MainStageController"><a href="#3-2-MainStageController" class="headerlink" title="3.2 MainStageController"></a>3.2 MainStageController</h3><p>每一个 fxml 布局文件对应一个 controller，要在 <code>fx:controller</code> 里面设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @description</div><div class="line"> * @create 2017-05-20 下午1:55</div><div class="line"> * @email spartajet.guo@gmail.com</div><div class="line"> */</div><div class="line">@FXMLController</div><div class="line">public class MainStageController implements Initializable &#123;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Called to initialize a controller after its root element has been</div><div class="line">     * completely processed.</div><div class="line">     *</div><div class="line">     * @param location  The location used to resolve relative paths for the root object, or</div><div class="line">     *                  &lt;tt&gt;null&lt;/tt&gt; if the location is not known.</div><div class="line">     * @param resources The resources used to localize the root object, or &lt;tt&gt;null&lt;/tt&gt; if</div><div class="line">     */</div><div class="line">    public void initialize(URL location, ResourceBundle resources) &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现<code>Initializable</code>接口，加上<code>@FXMLController</code>注解，其实很简单的。看看<code>@FXMLController</code>的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface FXMLController &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="3-3-MainStageView"><a href="#3-3-MainStageView" class="headerlink" title="3.3 MainStageView"></a>3.3 MainStageView</h3><p>这个是比较特殊的，在普通的 javafx 里面没有这个东西，但是按照 MVC 的角度来讲，业务和试图分离，还是很有必要的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@FXMLView(value = &quot;/view/MainStage.fxml&quot;)</div><div class="line">public class MainStageView extends AbstractFxmlView &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>添加的是注解<code>@FXMLView</code>，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface FXMLView &#123;</div><div class="line">	String value() default &quot;&quot;;</div><div class="line">	String[] css() default &#123;&#125;; </div><div class="line">	String bundle() default &quot;&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从这里也能看到，可以在这里注入 css 样式文件以及 bundle 文件。还是比较方便的，我是在 fxml 里面注入的 css 文件，都是可以的。<br>其中还继承了 <code>AbstractFxmlView</code> 的抽象类，方法比较少，最重要的是<code>getView</code>方法，返回的是<code>Node</code>对象。然后就可以随意的用这个视图了。</p>
+<h3 id="3-3-MainController"><a href="#3-3-MainController" class="headerlink" title="3.3 MainController"></a>3.3 MainController</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">public class MainController extends AbstractJavaFxApplicationSupport &#123;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * The entry point of application.</div><div class="line">     *</div><div class="line">     * @param args the input arguments</div><div class="line">     */</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        launchApp(MainController.class, MainStageView.class, args);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Start.</div><div class="line">     *</div><div class="line">     * @param stage the stage</div><div class="line">     *</div><div class="line">     * @exception Exception the exception</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    public void start(Stage stage) throws Exception &#123;</div><div class="line">        super.start(stage);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>继承自<code>AbstractJavaFxApplicationSupport</code> 可以看到源码，典型的<code>Aware</code>。然后就可以运行了。</p>
+<p>可以看到<br> <img src="http://ghost.guoxiaozhong.cn/2017-05-20-124621.jpg" alt=""></p>
+<p>这个是启动动画。可以自定义启动动画，个人认为，启动动画还是很有必要的，因为 springboot 启动费时还是比较多的，来个启动动画，逼格满满的。</p>
+<p>###3.4 启动动画</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @description</div><div class="line"> * @create 2017-05-20 下午2:54</div><div class="line"> * @email spartajet.guo@gmail.com</div><div class="line"> */</div><div class="line">public class CustomSplash extends SplashScreen &#123;</div><div class="line">    /**</div><div class="line">     * Use your own splash image instead of the default one</div><div class="line">     *</div><div class="line">     * @return &quot;/splash/javafx.png&quot;</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    public String getImagePath() &#123;</div><div class="line">        return super.getImagePath();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Customize if the splash screen should be visible at all</div><div class="line">     *</div><div class="line">     * @return true by default</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    public boolean visible() &#123;</div><div class="line">        return super.visible();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最常用的就是这两个方法了，一个是更换照片，另一个是是否显示启动动画。</p>
+<h2 id="4-0-打包"><a href="#4-0-打包" class="headerlink" title="4.0 打包"></a>4.0 打包</h2><p>JavaFX-Maven-Plugin可以打包 jar、native、webbundle、key-store这些。<br>由于我是 mac，一般用 jar和 native，执行命令<code>mvn jfx:native</code> 会看到打包成了pkg 和 dmg 两种类型的安装包。并且都是180M 左右。由于没有 windows 计算机，所以还不知道打包成 exe 的状态。这么大的包，主要是因为 java 的 jdk 问题，模块化以后就好了。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/05/20/javafx-spring-boot-maven/">JavaFx+Springboot+Maven 开发打包教程</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">郭晓忠</a></p>
+        <p><span>发布时间:</span>2017-05-20, 02:00:52</p>
+        <p><span>最后更新:</span>2017-05-20, 15:33:01</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/05/20/javafx-spring-boot-maven/" title="JavaFx+Springboot+Maven 开发打包教程">http://blog.spartajet.com/2017/05/20/javafx-spring-boot-maven/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://blog.spartajet.com/2017/05/20/javafx-spring-boot-maven/　　作者: 郭晓忠" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2017/05/20/2017-05-20/">
+                    Nginx 最全小白实战教程之三 （代理TCP篇）
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/05/20/nginx-doc-02/">
+                    Nginx 最全小白实战教程之二 （代理篇）
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-介绍"><span class="toc-number">1.</span> <span class="toc-text">1. 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Maven-配置"><span class="toc-number">2.</span> <span class="toc-text">2. Maven 配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Javafx-集成springboot"><span class="toc-number">3.</span> <span class="toc-text">3. Javafx 集成springboot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-创建-FXML-布局文件"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 创建 FXML 布局文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-MainStageController"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 MainStageController</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-MainStageView"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 MainStageView</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-MainController"><span class="toc-number">3.4.</span> <span class="toc-text">3.3 MainController</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-0-打包"><span class="toc-number">4.</span> <span class="toc-text">4.0 打包</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"JavaFx+Springboot+Maven 开发打包教程　| 郭晓忠的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+        <section class="youyan" id="comments">
+    <script>
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = 'http://v2.uyan.cc/code/uyan.js?uid=2134017';
+            (d.head || d.body).appendChild(s);
+        }
+    </script>
+    
+    <script> loadComment(); </script>
+
+    <div id="uyan_frame"></div>
+</section>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/05/20/2017-05-20/" title="上一篇: Nginx 最全小白实战教程之三 （代理TCP篇）">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/05/20/nginx-doc-02/" title="下一篇: Nginx 最全小白实战教程之二 （代理篇）">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20-1/">NJ4X源码阅读分析笔记系列（一）——项目整体分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20-2/">NJ4X源码阅读分析笔记系列（二）—— nj4x-ts初步分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20-3/">NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20/">Nginx 最全小白实战教程之三 （代理TCP篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/javafx-spring-boot-maven/">JavaFx+Springboot+Maven 开发打包教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/nginx-doc-02/">Nginx 最全小白实战教程之二 （代理篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/nginx-doc-01/">Nginx 最全小白实战教程之一 （安装篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/spring-boot-sharding-jdbc/">springboot+sharding-jdbc+mybatis+mysql全注解实现增量数据库分片实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/19/hello-world/">Hello World</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2017 郭晓忠
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

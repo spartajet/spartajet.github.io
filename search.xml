@@ -3,151 +3,6 @@
   
     
     <entry>
-      <title><![CDATA[Nginx 最全小白实战教程之三 （代理TCP篇）]]></title>
-      <url>/2017/05/20/2017-05-20/</url>
-      <content type="html"><![CDATA[<blockquote>
-<p>Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。<br>我用它来代理Mysql。</p>
-</blockquote>
-<p>###一、配置代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">stream &#123;</div><div class="line">    upstream mysqls &#123;</div><div class="line">        hash $remote_addr consistent;</div><div class="line">        server 192.168.58.143:3306 weight=5 max_fails=3 fail_timeout=30s;</div><div class="line">        server 192.168.58.142:3306 weight=1 max_fails=3 fail_timeout=30s;</div><div class="line">    &#125;</div><div class="line">    server &#123;</div><div class="line">        listen 9945;</div><div class="line">        proxy_connect_timeout 1s;</div><div class="line">        proxy_timeout 3s;</div><div class="line">        proxy_pass mysqls;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这个就是一个最基本的配置</p>
-<p>有几个注意的地方：</p>
-<ol>
-<li><code>stream</code>的配置必须是和<code>events</code>同级的，所以我直接就写在了<code>nginx.conf</code>主配置文件中的，这样就确保了和<code>events</code>同级。当然也可以单独写出来。</li>
-<li>这里的<code>server</code>里面是不准写<code>location</code>的，所以就不能判断<code>\sss\</code>这样的路径来做的。我开始的时候想这样的，模仿<code>spring</code>实现的<code>websocket</code>，后来才意识到，<code>websocket</code>可以这样是因为它连接是靠<code>http</code>协议的，传输才靠<code>tcp</code>的。终于明白了。</li>
-<li><code>server</code>的监听端口不能和<code>http</code>的重复。</li>
-<li>重新加载nginx时候可能会出现错误：<code>[emerg] 30181#0: bind() to 0.0.0.0:8090 failed (13: Permission denied)</code> 这个错误是由于<code>SElinux</code>，关掉这就好了。</li>
-<li>关闭<code>SElinux</code>方法：修改<code>/etc/selinux/config</code> 文件，将<code>SELINUX=enforcing</code>改为<code>SELINUX=disabled</code>重启之后就好了。</li>
-</ol>
-<h3 id="二、用法"><a href="#二、用法" class="headerlink" title="二、用法"></a>二、用法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">语法:	listen address:port [ssl] [udp] [proxy_protocol] [backlog=number] [bind] [ipv6only=on|off] [reuseport] [so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]];</div><div class="line">默认值: —</div><div class="line">上下文: server</div></pre></td></tr></table></figure>
-<p>设置方式可以是下面任意一种：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">listen 127.0.0.1:12345;</div><div class="line">listen *:12345;</div><div class="line">listen 12345;     # same as *:12345</div><div class="line">listen localhost:12345;</div></pre></td></tr></table></figure>
-<p>IPV6必须加上中括号：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">listen [::1]:12345;</div><div class="line">listen [::]:12345;</div></pre></td></tr></table></figure>
-<p>UNIX-domain sockets要写<code>unix:</code> 前缀</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">listen unix:/var/run/nginx.sock;</div></pre></td></tr></table></figure>
-<p><code>ssl</code><br>指定连接此端口的连接都是<code>SSL模式</code></p>
-<p><code>udp</code><br>用于处理套接字</p>
-<p><code>proxy_protocol</code><br>指定此端口上的所有连接都使用 <a href="http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt" target="_blank" rel="external">PROXY protocol</a>协议</p>
-<p><code>backlog=number</code><br>限制挂起连接队列的最大长度（1.9.2）。默认情况下，backlog在FreeBSD，DragonFly BSD和Mac OS X上设置为-1，在其他平台上设置为511。</p>
-<p><code>bind</code><br>表示对一个指定的<code>address:port</code>对进行单独的绑定。实是，如果有几个listen指令具有相同的端口但地址不同，并且其中一个listen指令监听给定端口<code>（\*：port）</code>的所有地址，nginx将只绑定<code>\*：port</code>。 应该注意，在这种情况下调用getsockname（）以确定接受连接的地址。 如果使用ipv6only或so_keepalive参数，那么对于给定的地址：端口对将始终进行单独的绑定。</p>
-<p><code>ipv6only=on|off</code><br>确定侦听通配符地址[::]的IPv6套接字是否只接受IPv6连接，或者是接受IPv6和IPv4连接。 此参数默认处于打开状态。 且它只能在启动时设置一次。</p>
-<p><code>so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]</code><br>此参数配置侦听套接字的<code>“TCP keepalive”</code>行为。 如果省略此参数，则操作系统的设置将对套接字生效。 如果将其设置为值“on”，则套接字的SO_KEEPALIVE选项将打开。 如果它设置为值“off”，则套接字的SO_KEEPALIVE选项被关闭。 某些操作系统支持使用TCP_KEEPIDLE，TCP_KEEPINTVL和TCP_KEEPCNT套接字选项在每个套接字上设置TCP保持活动参数。 在这些系统（目前，Linux 2.4+，NetBSD 5+和FreeBSD 9.0-STABLE）上，可以使用keepidle，keepintvl和keepcnt参数配置它们。 可以省略一个或两个参数，在这种情况下，相应套接字选项的系统默认设置将有效。 例如，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">so_keepalive=30m::10</div></pre></td></tr></table></figure>
-<h3 id="三、相关指令"><a href="#三、相关指令" class="headerlink" title="三、相关指令"></a>三、相关指令</h3><p>1.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的大小</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_buffer_size size;</div><div class="line">Default:	</div><div class="line">preread_buffer_size 16k;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
-<p>2.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的超时时间</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_timeout timeout;</div><div class="line">Default:	</div><div class="line">preread_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
-<p>3.指定完成读取代理协议头的超时时间，如果超过这个时间，就关闭连接</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	proxy_protocol_timeout timeout;</div><div class="line">Default:	</div><div class="line">proxy_protocol_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
-<p>4.配置用于将upstream servers中名称解析到地址的服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver address ... [valid=time] [ipv6=on|off];</div><div class="line">Default:	—</div><div class="line">Context:	stream, server</div><div class="line">This directive appeared in version 1.11.3.</div></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">resolver 127.0.0.1 [::1]:5353;</div><div class="line">resolver 127.0.0.1 [::1]:5353 valid=30s;</div></pre></td></tr></table></figure>
-<p>5.名字解析的超时时间</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver_timeout time;</div><div class="line">Default:	</div><div class="line">resolver_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
-<p>6.配置服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	server &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
-<p>7.配置stream服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	stream &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	main</div></pre></td></tr></table></figure>
-<p>8.配置是否允许<code>TCP_NODELAY</code>选项，这个可以用在客户端和代理服务器上</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	tcp_nodelay on | off;</div><div class="line">Default:	</div><div class="line">tcp_nodelay on;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
-<p>9.设置变量的哈希表容量。 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_bucket_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_bucket_size 64;</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
-<p>10.设置变量的哈希表最大容量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_max_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_max_size 1024;</div><div class="line">Context:	stream</div><div class="line">This directive appeared in version 1.11.2.</div></pre></td></tr></table></figure>
-<p>###四、相关变量</p>
-<ol>
-<li><code>$binary_remote_addr</code>：二进制形式的客户端地址，对于IPv4地址，值的长度始终为4字节，对于IPv6地址，值的长度始终为16字节</li>
-<li><code>$bytes_received</code>：从客户端接收到的字节数</li>
-<li><code>$bytes_sent</code>：发送到客户端的字节数</li>
-<li><code>$connection</code>：连接序列号</li>
-<li><code>$hostname</code>：host名称</li>
-<li><code>$msec</code>：当前时间(秒)，以毫秒为单位</li>
-<li><code>$nginx_version</code>：nginx版本</li>
-<li><code>$pid</code>：work process的pid</li>
-<li><code>$protocol</code>：和客户端通信的协议：TCP或者UDP</li>
-<li><code>$proxy_protocol_addr</code>：PROXY协议头中的客户端地址，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
-<li><code>$proxy_protocol_port</code>：PROXY协议头中的客户端端口，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
-<li><code>$remote_addr</code>：客户端地址</li>
-<li><code>$server_addr</code>：接收连接的服务器地址。<strong>计算此变量的值通常需要一次系统调用。 为了避免系统调用，listen指令必须指定地址并使用bind参数。</strong></li>
-<li><code>$server_port</code>：接收连接的服务器端口</li>
-<li><code>$session_time</code>：会话持续时间（秒），以毫秒为单位</li>
-<li><code>$time_iso8601</code>：ISO8610格式的本地时间</li>
-<li><code>$time_local</code>：通用日志格式的本地时间</li>
-<li><code>status</code>：状态值。200：会话完成；400：客户端数据无法解析，例如PROXY协议头；403：访问受限；500：内部服务器错误；502：网关错误；503：服务不可用。</li>
-</ol>
-]]></content>
-      
-        
-        <tags>
-            
-            <tag> Nginx </tag>
-            
-            <tag> 代理 </tag>
-            
-            <tag> 教程 </tag>
-            
-            <tag> TCP </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Nginx 最全小白实战教程之二 （代理篇）]]></title>
-      <url>/2017/05/20/nginx-doc-02/</url>
-      <content type="html"><![CDATA[<h2 id="一、相关概念"><a href="#一、相关概念" class="headerlink" title="一、相关概念"></a>一、相关概念</h2><p>代理一般分为正向代理和反向代理，以下是他们的定义(以下内容引自网上)</p>
-<blockquote>
-<p><strong>正向代理</strong>，也就是传说中的代理,他的工作原理就像一个跳板，简单的说，我是一个用户，我访问不了某网站，但是我能访问一个代理服务器，这个代理服务器呢，他能访问那个我不能访问的网站，于是我先连上代理服务器，告诉他我需要那个无法访问网站的内容，代理服务器去取回来，然后返回给我。从网站的角度，只在代理服务器来取内容的时候有一次记录，有时候并不知道是用户的请求，也隐藏了用户的资料，这取决于代理告不告诉网站。<br>结论就是，正向代理 是一个位于客户端和原始服务器(origin server)之间的服务器，为了从原始服务器取得内容，客户端向代理发送一个请求并指定目标(原始服务器)，然后代理向原始服务器转交请求并将获得的内容返回给客户端。客户端必须要进行一些特别的设置才能使用正向代理。</p>
-<p><strong>反向代理</strong> 例如用户访问 <a href="http://www.test.com/readme" target="_blank" rel="external">http://www.test.com/readme</a> ，但www.test.com上并不存在readme页面，他是偷偷从另外一台服务器上取回来，然后作为自己的内容返回用户，但用户并不知情。这里所提到的 www.test.com 这个域名对应的服务器就设置了反向代理功能。<br>结论就是，反向代理正好相反，对于客户端而言它就像是原始服务器，并且客户端不需要进行任何特别的设置。客户端向反向代理的命名空间(name-space)中的内容发送普通请求，接着反向代理将判断向何处(原始服务器)转交请求，并将获得的内容返回给客户端，就像这些内容原本就是它自己的一样。</p>
-</blockquote>
-<p>两者区别就是：</p>
-<ol>
-<li>从<strong>用途</strong>上讲，正向代理的典型用途是为在防火墙内的局域网客户端提供访问Internet的途径。正向代理还可以使用缓冲特性减少网络使用率。反向代理的典型用途是将防火墙后面的服务器提供给Internet用户访问。反向代理还可以为后端的多台服务器提供负载平衡，或为后端较慢的服务器提供缓冲服务。另外，反向代理还可以启用高级URL策略和管理技术，从而使处于不同web服务器系统的web页面同时存在于同一个URL空间下。</li>
-<li>从<strong>安全性</strong>讲，正向代理允许客户端通过它访问任意网站并且隐藏客户端自身，因此你必须采取安全措施以确保仅为经过授权的客户端提供服务。反向代理对外都是透明的，访问者并不知道自己访问的是一个代理。</li>
-</ol>
-<h2 id="二、Nginx代理"><a href="#二、Nginx代理" class="headerlink" title="二、Nginx代理"></a>二、Nginx代理</h2><h4 id="1-简单的代理"><a href="#1-简单的代理" class="headerlink" title="1.简单的代理"></a>1.简单的代理</h4><p>这样安装的配置文件位置在<code>/etc/nginx/conf.d</code>。其中有一个默认的配置文件<code>default.conf</code>，内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  localhost;</div><div class="line"></div><div class="line">    #charset koi8-r;</div><div class="line">    #access_log  /var/log/nginx/log/host.access.log  main;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root   /usr/share/nginx/html;</div><div class="line">        index  index.html index.htm;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    #error_page  404              /404.html;</div><div class="line"></div><div class="line">    # redirect server error pages to the static page /50x.html</div><div class="line">    #</div><div class="line">    error_page   500 502 503 504  /50x.html;</div><div class="line">    location = /50x.html &#123;</div><div class="line">        root   /usr/share/nginx/html;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    # proxy the PHP scripts to Apache listening on 127.0.0.1:80</div><div class="line">    #</div><div class="line">    #location ~ \.php$ &#123;</div><div class="line">    #    proxy_pass   http://127.0.0.1;</div><div class="line">    #&#125;</div><div class="line"></div><div class="line">    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</div><div class="line">    #</div><div class="line">    #location ~ \.php$ &#123;</div><div class="line">    #    root           html;</div><div class="line">    #    fastcgi_pass   127.0.0.1:9000;</div><div class="line">    #    fastcgi_index  index.php;</div><div class="line">    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</div><div class="line">    #    include        fastcgi_params;</div><div class="line">    #&#125;</div><div class="line"></div><div class="line">    # deny access to .htaccess files, if Apache&apos;s document root</div><div class="line">    # concurs with nginx&apos;s one</div><div class="line">    #</div><div class="line">    #location ~ /\.ht &#123;</div><div class="line">    #    deny  all;</div><div class="line">    #&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这是一个比较全面的配置文件。且该目录下所有的<code>.conf</code>文件都会加载的，只要配置不冲突，所有的配置都会生效。</p>
-<p>接下来在此目录新建<code>guo.conf</code>，将此域名访问代理我的个人博客 www.guoxiaozhong.cn。<br>具体内容如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  你的域名或者IP;  </div><div class="line">    location / &#123;</div><div class="line">        proxy_pass http://www.guoxiaozhong.cn;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>重新加载配置文件;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@localhost conf.d]# service nginx reload</div><div class="line">Reloading nginx:                                           [  OK  ]</div><div class="line">[root@localhost conf.d]# service nginx restart</div><div class="line">Stopping nginx:                                            [  OK  ]</div><div class="line">Starting nginx:                                            [  OK  ]</div></pre></td></tr></table></figure>
-<p>访问效果如下：<br><img src="http://ghost.guoxiaozhong.cn/ghost/2017-01-03-030235.jpg" alt=""></p>
-<p>目前的代理拓扑图为：<br><img src="http://ghost.guoxiaozhong.cn/ghost/2017-01-03-031823.jpg" alt=""></p>
-<h4 id="2-指令说明"><a href="#2-指令说明" class="headerlink" title="2.指令说明"></a>2.指令说明</h4><p><strong>listen</strong>:要监听的端口，我们一般都是监听80端口，其他端口都封死，防火墙只剩80<br><strong>server_name</strong>：服务器的IP或者绑定的域名<br><strong>location /</strong>：这个是路径的意思，<code>/</code>这个是代表访问的路径，<code>/</code>代表根目录</p>
-<p><strong>proxy_pass</strong>指令：</p>
-<p>语法：proxyz_pass URL<br>默认值：no<br>使用字段：location，location中的if字段</p>
-<p>这个指令设置被代理服务器的地址和被映射的URI，地址可以使用主机名或IP加端口号的形式，例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_pass http://www.guoxiaozhong.cn;</div></pre></td></tr></table></figure>
-<p><strong>注意</strong>：一定要写<code>http://</code></p>
-<h4 id="3-分析日志"><a href="#3-分析日志" class="headerlink" title="3.分析日志"></a>3.分析日志</h4><h5 id="博客服务器的日志"><a href="#博客服务器的日志" class="headerlink" title="博客服务器的日志"></a>博客服务器的日志</h5><p>www.guoxiaozhong 博客服务器的日志</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:19 +0800] &quot;GET /2016/11/29/office-2016-for-mac-de-wordmo-ban-wen-jian-jia-wei-zhi/ HTTP/1.0&quot; 200 4112 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:20 +0800] &quot;GET /content/images/2016/10/logo.jpeg HTTP/1.0&quot; 206 1 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:20 +0800] &quot;GET /content/images/2016/10/logo.jpeg HTTP/1.0&quot; 206 1778 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:21 +0800] &quot;GET /assets/images/favicon.png HTTP/1.0&quot; 200 2562 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:53 +0800] &quot;GET / HTTP/1.0&quot; 200 3951 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:53 +0800] &quot;GET /assets/css/vno.css?v=6d7f73f25e HTTP/1.0&quot; 200 4187 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:54 +0800] &quot;GET /assets/css/tomorrow.css?v=6d7f73f25e HTTP/1.0&quot; 200 610 &quot;http://xtrader.spartajet.com/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:54 +0800] &quot;GET /assets/css/animate.css HTTP/1.0&quot; 200 5066 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:55 +0800] &quot;GET /assets/js/main.js?v=6d7f73f25e HTTP/1.0&quot; 200 662 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:55 +0800] &quot;GET /assets/js/highlight.pack.js?v=6d7f73f25e HTTP/1.0&quot; 200 15760 &quot;http://xtrader.spartajet.com/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div></pre></td></tr></table></figure>
-<p>可以看到，我的博客服务器上的日志只显示Nginx的IP和Nginx设置的域名，没有客户端的信息。</p>
-<p>#####Nginx代理服务器的日志</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">客户端IP - - [03/Jan/2017:11:01:55 +0800] &quot;GET /assets/js/highlight.pack.js?v=6d7f73f25e HTTP/1.1&quot; 200 15788 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">客户端IP - - [03/Jan/2017:11:01:58 +0800] &quot;GET /content/images/2016/10/logo.jpeg HTTP/1.1&quot; 200 42960 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">客户端IP - - [03/Jan/2017:11:02:13 +0800] &quot;GET /content/images/2016/10/e69ef0aa357bd34022b2824daf3b5a33_r-1.jpg HTTP/1.1&quot; 200 176528 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">客户端IP - - [03/Jan/2017:11:02:16 +0800] &quot;GET /assets/images/favicon.png HTTP/1.1&quot; 200 2562 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div></pre></td></tr></table></figure>
-<p>代理服务器上的日志显示客户端的IP。</p>
-<h4 id="4-配置文件显示客户端IP"><a href="#4-配置文件显示客户端IP" class="headerlink" title="4.配置文件显示客户端IP"></a>4.配置文件显示客户端IP</h4><p>配置<code>guo.conf</code>文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  博客代理域名;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        proxy_pass http://www.guoxiaozhong.cn;</div><div class="line">        proxy_set_header            X-real-ip $remote_addr;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>主要是加上;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_set_header            X-real-ip $remote_addr;</div></pre></td></tr></table></figure>
-]]></content>
-      
-        
-        <tags>
-            
-            <tag> Nginx </tag>
-            
-            <tag> 代理 </tag>
-            
-            <tag> 教程 </tag>
-            
-        </tags>
-        
-    </entry>
-    
-    <entry>
       <title><![CDATA[NJ4X源码阅读分析笔记系列（一）——项目整体分析]]></title>
       <url>/2017/05/20/2017-05-20-1/</url>
       <content type="html"><![CDATA[<h1 id="NJ4X源码阅读分析笔记系列（一）——项目整体分析"><a href="#NJ4X源码阅读分析笔记系列（一）——项目整体分析" class="headerlink" title="NJ4X源码阅读分析笔记系列（一）——项目整体分析"></a>NJ4X源码阅读分析笔记系列（一）——项目整体分析</h1><h2 id="NJ4X是什么"><a href="#NJ4X是什么" class="headerlink" title="NJ4X是什么"></a>NJ4X是什么</h2><p>参见NJ4X的官网：<a href="http://www.nj4x.com/" target="_blank" rel="external">http://www.nj4x.com/</a></p>
@@ -361,6 +216,194 @@
             <tag> NJ4X </tag>
             
             <tag> 源码分析 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Nginx 最全小白实战教程之三 （代理TCP篇）]]></title>
+      <url>/2017/05/20/2017-05-20/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。<br>我用它来代理Mysql。</p>
+</blockquote>
+<p>###一、配置代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">stream &#123;</div><div class="line">    upstream mysqls &#123;</div><div class="line">        hash $remote_addr consistent;</div><div class="line">        server 192.168.58.143:3306 weight=5 max_fails=3 fail_timeout=30s;</div><div class="line">        server 192.168.58.142:3306 weight=1 max_fails=3 fail_timeout=30s;</div><div class="line">    &#125;</div><div class="line">    server &#123;</div><div class="line">        listen 9945;</div><div class="line">        proxy_connect_timeout 1s;</div><div class="line">        proxy_timeout 3s;</div><div class="line">        proxy_pass mysqls;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个就是一个最基本的配置</p>
+<p>有几个注意的地方：</p>
+<ol>
+<li><code>stream</code>的配置必须是和<code>events</code>同级的，所以我直接就写在了<code>nginx.conf</code>主配置文件中的，这样就确保了和<code>events</code>同级。当然也可以单独写出来。</li>
+<li>这里的<code>server</code>里面是不准写<code>location</code>的，所以就不能判断<code>\sss\</code>这样的路径来做的。我开始的时候想这样的，模仿<code>spring</code>实现的<code>websocket</code>，后来才意识到，<code>websocket</code>可以这样是因为它连接是靠<code>http</code>协议的，传输才靠<code>tcp</code>的。终于明白了。</li>
+<li><code>server</code>的监听端口不能和<code>http</code>的重复。</li>
+<li>重新加载nginx时候可能会出现错误：<code>[emerg] 30181#0: bind() to 0.0.0.0:8090 failed (13: Permission denied)</code> 这个错误是由于<code>SElinux</code>，关掉这就好了。</li>
+<li>关闭<code>SElinux</code>方法：修改<code>/etc/selinux/config</code> 文件，将<code>SELINUX=enforcing</code>改为<code>SELINUX=disabled</code>重启之后就好了。</li>
+</ol>
+<h3 id="二、用法"><a href="#二、用法" class="headerlink" title="二、用法"></a>二、用法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">语法:	listen address:port [ssl] [udp] [proxy_protocol] [backlog=number] [bind] [ipv6only=on|off] [reuseport] [so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]];</div><div class="line">默认值: —</div><div class="line">上下文: server</div></pre></td></tr></table></figure>
+<p>设置方式可以是下面任意一种：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">listen 127.0.0.1:12345;</div><div class="line">listen *:12345;</div><div class="line">listen 12345;     # same as *:12345</div><div class="line">listen localhost:12345;</div></pre></td></tr></table></figure>
+<p>IPV6必须加上中括号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">listen [::1]:12345;</div><div class="line">listen [::]:12345;</div></pre></td></tr></table></figure>
+<p>UNIX-domain sockets要写<code>unix:</code> 前缀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">listen unix:/var/run/nginx.sock;</div></pre></td></tr></table></figure>
+<p><code>ssl</code><br>指定连接此端口的连接都是<code>SSL模式</code></p>
+<p><code>udp</code><br>用于处理套接字</p>
+<p><code>proxy_protocol</code><br>指定此端口上的所有连接都使用 <a href="http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt" target="_blank" rel="external">PROXY protocol</a>协议</p>
+<p><code>backlog=number</code><br>限制挂起连接队列的最大长度（1.9.2）。默认情况下，backlog在FreeBSD，DragonFly BSD和Mac OS X上设置为-1，在其他平台上设置为511。</p>
+<p><code>bind</code><br>表示对一个指定的<code>address:port</code>对进行单独的绑定。实是，如果有几个listen指令具有相同的端口但地址不同，并且其中一个listen指令监听给定端口<code>（\*：port）</code>的所有地址，nginx将只绑定<code>\*：port</code>。 应该注意，在这种情况下调用getsockname（）以确定接受连接的地址。 如果使用ipv6only或so_keepalive参数，那么对于给定的地址：端口对将始终进行单独的绑定。</p>
+<p><code>ipv6only=on|off</code><br>确定侦听通配符地址[::]的IPv6套接字是否只接受IPv6连接，或者是接受IPv6和IPv4连接。 此参数默认处于打开状态。 且它只能在启动时设置一次。</p>
+<p><code>so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]</code><br>此参数配置侦听套接字的<code>“TCP keepalive”</code>行为。 如果省略此参数，则操作系统的设置将对套接字生效。 如果将其设置为值“on”，则套接字的SO_KEEPALIVE选项将打开。 如果它设置为值“off”，则套接字的SO_KEEPALIVE选项被关闭。 某些操作系统支持使用TCP_KEEPIDLE，TCP_KEEPINTVL和TCP_KEEPCNT套接字选项在每个套接字上设置TCP保持活动参数。 在这些系统（目前，Linux 2.4+，NetBSD 5+和FreeBSD 9.0-STABLE）上，可以使用keepidle，keepintvl和keepcnt参数配置它们。 可以省略一个或两个参数，在这种情况下，相应套接字选项的系统默认设置将有效。 例如，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">so_keepalive=30m::10</div></pre></td></tr></table></figure>
+<h3 id="三、相关指令"><a href="#三、相关指令" class="headerlink" title="三、相关指令"></a>三、相关指令</h3><p>1.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的大小</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_buffer_size size;</div><div class="line">Default:	</div><div class="line">preread_buffer_size 16k;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>2.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的超时时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_timeout timeout;</div><div class="line">Default:	</div><div class="line">preread_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>3.指定完成读取代理协议头的超时时间，如果超过这个时间，就关闭连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	proxy_protocol_timeout timeout;</div><div class="line">Default:	</div><div class="line">proxy_protocol_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>4.配置用于将upstream servers中名称解析到地址的服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver address ... [valid=time] [ipv6=on|off];</div><div class="line">Default:	—</div><div class="line">Context:	stream, server</div><div class="line">This directive appeared in version 1.11.3.</div></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">resolver 127.0.0.1 [::1]:5353;</div><div class="line">resolver 127.0.0.1 [::1]:5353 valid=30s;</div></pre></td></tr></table></figure>
+<p>5.名字解析的超时时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver_timeout time;</div><div class="line">Default:	</div><div class="line">resolver_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>6.配置服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	server &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
+<p>7.配置stream服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	stream &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	main</div></pre></td></tr></table></figure>
+<p>8.配置是否允许<code>TCP_NODELAY</code>选项，这个可以用在客户端和代理服务器上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	tcp_nodelay on | off;</div><div class="line">Default:	</div><div class="line">tcp_nodelay on;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>9.设置变量的哈希表容量。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_bucket_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_bucket_size 64;</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
+<p>10.设置变量的哈希表最大容量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_max_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_max_size 1024;</div><div class="line">Context:	stream</div><div class="line">This directive appeared in version 1.11.2.</div></pre></td></tr></table></figure>
+<p>###四、相关变量</p>
+<ol>
+<li><code>$binary_remote_addr</code>：二进制形式的客户端地址，对于IPv4地址，值的长度始终为4字节，对于IPv6地址，值的长度始终为16字节</li>
+<li><code>$bytes_received</code>：从客户端接收到的字节数</li>
+<li><code>$bytes_sent</code>：发送到客户端的字节数</li>
+<li><code>$connection</code>：连接序列号</li>
+<li><code>$hostname</code>：host名称</li>
+<li><code>$msec</code>：当前时间(秒)，以毫秒为单位</li>
+<li><code>$nginx_version</code>：nginx版本</li>
+<li><code>$pid</code>：work process的pid</li>
+<li><code>$protocol</code>：和客户端通信的协议：TCP或者UDP</li>
+<li><code>$proxy_protocol_addr</code>：PROXY协议头中的客户端地址，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
+<li><code>$proxy_protocol_port</code>：PROXY协议头中的客户端端口，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
+<li><code>$remote_addr</code>：客户端地址</li>
+<li><code>$server_addr</code>：接收连接的服务器地址。<strong>计算此变量的值通常需要一次系统调用。 为了避免系统调用，listen指令必须指定地址并使用bind参数。</strong></li>
+<li><code>$server_port</code>：接收连接的服务器端口</li>
+<li><code>$session_time</code>：会话持续时间（秒），以毫秒为单位</li>
+<li><code>$time_iso8601</code>：ISO8610格式的本地时间</li>
+<li><code>$time_local</code>：通用日志格式的本地时间</li>
+<li><code>status</code>：状态值。200：会话完成；400：客户端数据无法解析，例如PROXY协议头；403：访问受限；500：内部服务器错误；502：网关错误；503：服务不可用。</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Nginx </tag>
+            
+            <tag> 代理 </tag>
+            
+            <tag> 教程 </tag>
+            
+            <tag> TCP </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[JavaFx+Springboot+Maven 开发打包教程]]></title>
+      <url>/2017/05/20/javafx-spring-boot-maven/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>最近在用 JavaFx 开发窗体程序，并且以后打算把所有的窗体软件切换到 JavaFx 上面，并且还想用 <code>springboot</code> 的各种好处，集成了 <code>springboot</code> 就可以愉快的用各种服务了。所以就有了这个博客。。。<br>我本来想自己写一个 <code>javafx-spring-boot-starter</code> 的，其原理也是很简单地，利用 <code>springboot</code>的 <code>aware</code> 就可以了。但是发现德国这哥们已经写了一个，就变懒了。哎，没办法，我真的是太懒了。<br>本次的代码Github 地址：<a href="https://github.com/spartajet/javafx-boot-demo" target="_blank" rel="external">https://github.com/spartajet/javafx-boot-demo</a></p>
+</blockquote>
+<h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p><code>javafx</code>的<code>springboot</code>支持的库，官方是没有的，开源有一大堆。我采用的是<code>springboot-javafx-support</code> 地址是：<a href="https://github.com/roskenet/springboot-javafx-support" target="_blank" rel="external">springboot-javafx-support</a> .这个库文档比较全，比较详细，文档地址：<a href="https://www.felixroske.de/page/programmierung/index.html" target="_blank" rel="external">Spring Boot and JavaFx8</a> .</p>
+<p>用<code>springboot</code>必须用<code>maven</code>，否则那简直是灾难。最重要的是打包工具。我用的是<code>JavaFX Maven Plugin</code> 地址：<a href="https://github.com/javafx-maven-plugin/javafx-maven-plugin" target="_blank" rel="external">JavaFX Maven Plugin</a></p>
+<h2 id="2-Maven-配置"><a href="#2-Maven-配置" class="headerlink" title="2. Maven 配置"></a>2. Maven 配置</h2><p>maven 主要配置依赖库和插件，具体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-log4j2&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;spring.boot.version&#125;&lt;/version&gt;</div><div class="line">        &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;de.roskenet&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;springboot-javafx-support&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;$&#123;springboot-javafx-support.version&#125;&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div><div class="line">&lt;build&gt;</div><div class="line">    &lt;plugins&gt;</div><div class="line">        &lt;plugin&gt;</div><div class="line">            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</div><div class="line">        &lt;/plugin&gt;</div><div class="line">        &lt;plugin&gt;</div><div class="line">            &lt;groupId&gt;com.zenjava&lt;/groupId&gt;</div><div class="line">            &lt;artifactId&gt;javafx-maven-plugin&lt;/artifactId&gt;</div><div class="line">            &lt;configuration&gt;</div><div class="line">                &lt;mainClass&gt;com.spartajet.fxboot.demo.MainController&lt;/mainClass&gt;</div><div class="line">                &lt;vendor&gt;Spartajet&lt;/vendor&gt;</div><div class="line">            &lt;/configuration&gt;</div><div class="line">        &lt;/plugin&gt;</div><div class="line">    &lt;/plugins&gt;</div><div class="line">&lt;/build&gt;</div></pre></td></tr></table></figure>
+<p>其中，比较重要的是：<code>&lt;mainClass&gt;com.spartajet.fxboot.demo.MainController&lt;/mainClass&gt;</code> 这个是打包的时候的 main 类。<code>&lt;vendor&gt;Spartajet&lt;/vendor&gt;</code>是组织名称。</p>
+<h2 id="3-Javafx-集成springboot"><a href="#3-Javafx-集成springboot" class="headerlink" title="3. Javafx 集成springboot"></a>3. Javafx 集成springboot</h2><h3 id="3-1-创建-FXML-布局文件"><a href="#3-1-创建-FXML-布局文件" class="headerlink" title="3.1 创建 FXML 布局文件"></a>3.1 创建 FXML 布局文件</h3><p>可以用 <code>SceneBuilder</code> 工具创建 FXML 文件，我还是建议自己写 FXML，刚开始可能不习惯，慢慢习惯就好了。但是，<strong>我墙裂建议布局和样式分开，fxml 只管布局，css 只管样式。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;BorderPane id=&quot;mainBorderPane&quot; xmlns=&quot;http://javafx.com/javafx/8.0.111&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;com.spartajet.fxboot.demo.controller.MainStageController&quot; stylesheets=&quot;/css/MainStage.css&quot;&gt;</div><div class="line">&lt;/BorderPane&gt;</div></pre></td></tr></table></figure>
+<h3 id="3-2-MainStageController"><a href="#3-2-MainStageController" class="headerlink" title="3.2 MainStageController"></a>3.2 MainStageController</h3><p>每一个 fxml 布局文件对应一个 controller，要在 <code>fx:controller</code> 里面设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @description</div><div class="line"> * @create 2017-05-20 下午1:55</div><div class="line"> * @email spartajet.guo@gmail.com</div><div class="line"> */</div><div class="line">@FXMLController</div><div class="line">public class MainStageController implements Initializable &#123;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Called to initialize a controller after its root element has been</div><div class="line">     * completely processed.</div><div class="line">     *</div><div class="line">     * @param location  The location used to resolve relative paths for the root object, or</div><div class="line">     *                  &lt;tt&gt;null&lt;/tt&gt; if the location is not known.</div><div class="line">     * @param resources The resources used to localize the root object, or &lt;tt&gt;null&lt;/tt&gt; if</div><div class="line">     */</div><div class="line">    public void initialize(URL location, ResourceBundle resources) &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现<code>Initializable</code>接口，加上<code>@FXMLController</code>注解，其实很简单的。看看<code>@FXMLController</code>的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface FXMLController &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="3-3-MainStageView"><a href="#3-3-MainStageView" class="headerlink" title="3.3 MainStageView"></a>3.3 MainStageView</h3><p>这个是比较特殊的，在普通的 javafx 里面没有这个东西，但是按照 MVC 的角度来讲，业务和试图分离，还是很有必要的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@FXMLView(value = &quot;/view/MainStage.fxml&quot;)</div><div class="line">public class MainStageView extends AbstractFxmlView &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>添加的是注解<code>@FXMLView</code>，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface FXMLView &#123;</div><div class="line">	String value() default &quot;&quot;;</div><div class="line">	String[] css() default &#123;&#125;; </div><div class="line">	String bundle() default &quot;&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从这里也能看到，可以在这里注入 css 样式文件以及 bundle 文件。还是比较方便的，我是在 fxml 里面注入的 css 文件，都是可以的。<br>其中还继承了 <code>AbstractFxmlView</code> 的抽象类，方法比较少，最重要的是<code>getView</code>方法，返回的是<code>Node</code>对象。然后就可以随意的用这个视图了。</p>
+<h3 id="3-3-MainController"><a href="#3-3-MainController" class="headerlink" title="3.3 MainController"></a>3.3 MainController</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@SpringBootApplication</div><div class="line">public class MainController extends AbstractJavaFxApplicationSupport &#123;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * The entry point of application.</div><div class="line">     *</div><div class="line">     * @param args the input arguments</div><div class="line">     */</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        launchApp(MainController.class, MainStageView.class, args);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Start.</div><div class="line">     *</div><div class="line">     * @param stage the stage</div><div class="line">     *</div><div class="line">     * @exception Exception the exception</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    public void start(Stage stage) throws Exception &#123;</div><div class="line">        super.start(stage);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>继承自<code>AbstractJavaFxApplicationSupport</code> 可以看到源码，典型的<code>Aware</code>。然后就可以运行了。</p>
+<p>可以看到<br> <img src="http://ghost.guoxiaozhong.cn/2017-05-20-124621.jpg" alt=""></p>
+<p>这个是启动动画。可以自定义启动动画，个人认为，启动动画还是很有必要的，因为 springboot 启动费时还是比较多的，来个启动动画，逼格满满的。</p>
+<p>###3.4 启动动画</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @description</div><div class="line"> * @create 2017-05-20 下午2:54</div><div class="line"> * @email spartajet.guo@gmail.com</div><div class="line"> */</div><div class="line">public class CustomSplash extends SplashScreen &#123;</div><div class="line">    /**</div><div class="line">     * Use your own splash image instead of the default one</div><div class="line">     *</div><div class="line">     * @return &quot;/splash/javafx.png&quot;</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    public String getImagePath() &#123;</div><div class="line">        return super.getImagePath();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Customize if the splash screen should be visible at all</div><div class="line">     *</div><div class="line">     * @return true by default</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    public boolean visible() &#123;</div><div class="line">        return super.visible();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最常用的就是这两个方法了，一个是更换照片，另一个是是否显示启动动画。</p>
+<h2 id="4-0-打包"><a href="#4-0-打包" class="headerlink" title="4.0 打包"></a>4.0 打包</h2><p>JavaFX-Maven-Plugin可以打包 jar、native、webbundle、key-store这些。<br>由于我是 mac，一般用 jar和 native，执行命令<code>mvn jfx:native</code> 会看到打包成了pkg 和 dmg 两种类型的安装包。并且都是180M 左右。由于没有 windows 计算机，所以还不知道打包成 exe 的状态。这么大的包，主要是因为 java 的 jdk 问题，模块化以后就好了。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> javafx </tag>
+            
+            <tag> springboot </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Nginx 最全小白实战教程之二 （代理篇）]]></title>
+      <url>/2017/05/20/nginx-doc-02/</url>
+      <content type="html"><![CDATA[<h2 id="一、相关概念"><a href="#一、相关概念" class="headerlink" title="一、相关概念"></a>一、相关概念</h2><p>代理一般分为正向代理和反向代理，以下是他们的定义(以下内容引自网上)</p>
+<blockquote>
+<p><strong>正向代理</strong>，也就是传说中的代理,他的工作原理就像一个跳板，简单的说，我是一个用户，我访问不了某网站，但是我能访问一个代理服务器，这个代理服务器呢，他能访问那个我不能访问的网站，于是我先连上代理服务器，告诉他我需要那个无法访问网站的内容，代理服务器去取回来，然后返回给我。从网站的角度，只在代理服务器来取内容的时候有一次记录，有时候并不知道是用户的请求，也隐藏了用户的资料，这取决于代理告不告诉网站。<br>结论就是，正向代理 是一个位于客户端和原始服务器(origin server)之间的服务器，为了从原始服务器取得内容，客户端向代理发送一个请求并指定目标(原始服务器)，然后代理向原始服务器转交请求并将获得的内容返回给客户端。客户端必须要进行一些特别的设置才能使用正向代理。</p>
+<p><strong>反向代理</strong> 例如用户访问 <a href="http://www.test.com/readme" target="_blank" rel="external">http://www.test.com/readme</a> ，但www.test.com上并不存在readme页面，他是偷偷从另外一台服务器上取回来，然后作为自己的内容返回用户，但用户并不知情。这里所提到的 www.test.com 这个域名对应的服务器就设置了反向代理功能。<br>结论就是，反向代理正好相反，对于客户端而言它就像是原始服务器，并且客户端不需要进行任何特别的设置。客户端向反向代理的命名空间(name-space)中的内容发送普通请求，接着反向代理将判断向何处(原始服务器)转交请求，并将获得的内容返回给客户端，就像这些内容原本就是它自己的一样。</p>
+</blockquote>
+<p>两者区别就是：</p>
+<ol>
+<li>从<strong>用途</strong>上讲，正向代理的典型用途是为在防火墙内的局域网客户端提供访问Internet的途径。正向代理还可以使用缓冲特性减少网络使用率。反向代理的典型用途是将防火墙后面的服务器提供给Internet用户访问。反向代理还可以为后端的多台服务器提供负载平衡，或为后端较慢的服务器提供缓冲服务。另外，反向代理还可以启用高级URL策略和管理技术，从而使处于不同web服务器系统的web页面同时存在于同一个URL空间下。</li>
+<li>从<strong>安全性</strong>讲，正向代理允许客户端通过它访问任意网站并且隐藏客户端自身，因此你必须采取安全措施以确保仅为经过授权的客户端提供服务。反向代理对外都是透明的，访问者并不知道自己访问的是一个代理。</li>
+</ol>
+<h2 id="二、Nginx代理"><a href="#二、Nginx代理" class="headerlink" title="二、Nginx代理"></a>二、Nginx代理</h2><h4 id="1-简单的代理"><a href="#1-简单的代理" class="headerlink" title="1.简单的代理"></a>1.简单的代理</h4><p>这样安装的配置文件位置在<code>/etc/nginx/conf.d</code>。其中有一个默认的配置文件<code>default.conf</code>，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  localhost;</div><div class="line"></div><div class="line">    #charset koi8-r;</div><div class="line">    #access_log  /var/log/nginx/log/host.access.log  main;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        root   /usr/share/nginx/html;</div><div class="line">        index  index.html index.htm;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    #error_page  404              /404.html;</div><div class="line"></div><div class="line">    # redirect server error pages to the static page /50x.html</div><div class="line">    #</div><div class="line">    error_page   500 502 503 504  /50x.html;</div><div class="line">    location = /50x.html &#123;</div><div class="line">        root   /usr/share/nginx/html;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    # proxy the PHP scripts to Apache listening on 127.0.0.1:80</div><div class="line">    #</div><div class="line">    #location ~ \.php$ &#123;</div><div class="line">    #    proxy_pass   http://127.0.0.1;</div><div class="line">    #&#125;</div><div class="line"></div><div class="line">    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</div><div class="line">    #</div><div class="line">    #location ~ \.php$ &#123;</div><div class="line">    #    root           html;</div><div class="line">    #    fastcgi_pass   127.0.0.1:9000;</div><div class="line">    #    fastcgi_index  index.php;</div><div class="line">    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</div><div class="line">    #    include        fastcgi_params;</div><div class="line">    #&#125;</div><div class="line"></div><div class="line">    # deny access to .htaccess files, if Apache&apos;s document root</div><div class="line">    # concurs with nginx&apos;s one</div><div class="line">    #</div><div class="line">    #location ~ /\.ht &#123;</div><div class="line">    #    deny  all;</div><div class="line">    #&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这是一个比较全面的配置文件。且该目录下所有的<code>.conf</code>文件都会加载的，只要配置不冲突，所有的配置都会生效。</p>
+<p>接下来在此目录新建<code>guo.conf</code>，将此域名访问代理我的个人博客 www.guoxiaozhong.cn。<br>具体内容如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  你的域名或者IP;  </div><div class="line">    location / &#123;</div><div class="line">        proxy_pass http://www.guoxiaozhong.cn;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>重新加载配置文件;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@localhost conf.d]# service nginx reload</div><div class="line">Reloading nginx:                                           [  OK  ]</div><div class="line">[root@localhost conf.d]# service nginx restart</div><div class="line">Stopping nginx:                                            [  OK  ]</div><div class="line">Starting nginx:                                            [  OK  ]</div></pre></td></tr></table></figure>
+<p>访问效果如下：<br><img src="http://ghost.guoxiaozhong.cn/ghost/2017-01-03-030235.jpg" alt=""></p>
+<p>目前的代理拓扑图为：<br><img src="http://ghost.guoxiaozhong.cn/ghost/2017-01-03-031823.jpg" alt=""></p>
+<h4 id="2-指令说明"><a href="#2-指令说明" class="headerlink" title="2.指令说明"></a>2.指令说明</h4><p><strong>listen</strong>:要监听的端口，我们一般都是监听80端口，其他端口都封死，防火墙只剩80<br><strong>server_name</strong>：服务器的IP或者绑定的域名<br><strong>location /</strong>：这个是路径的意思，<code>/</code>这个是代表访问的路径，<code>/</code>代表根目录</p>
+<p><strong>proxy_pass</strong>指令：</p>
+<p>语法：proxyz_pass URL<br>默认值：no<br>使用字段：location，location中的if字段</p>
+<p>这个指令设置被代理服务器的地址和被映射的URI，地址可以使用主机名或IP加端口号的形式，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_pass http://www.guoxiaozhong.cn;</div></pre></td></tr></table></figure>
+<p><strong>注意</strong>：一定要写<code>http://</code></p>
+<h4 id="3-分析日志"><a href="#3-分析日志" class="headerlink" title="3.分析日志"></a>3.分析日志</h4><h5 id="博客服务器的日志"><a href="#博客服务器的日志" class="headerlink" title="博客服务器的日志"></a>博客服务器的日志</h5><p>www.guoxiaozhong 博客服务器的日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:19 +0800] &quot;GET /2016/11/29/office-2016-for-mac-de-wordmo-ban-wen-jian-jia-wei-zhi/ HTTP/1.0&quot; 200 4112 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:20 +0800] &quot;GET /content/images/2016/10/logo.jpeg HTTP/1.0&quot; 206 1 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:20 +0800] &quot;GET /content/images/2016/10/logo.jpeg HTTP/1.0&quot; 206 1778 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:10:49:21 +0800] &quot;GET /assets/images/favicon.png HTTP/1.0&quot; 200 2562 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:53 +0800] &quot;GET / HTTP/1.0&quot; 200 3951 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:53 +0800] &quot;GET /assets/css/vno.css?v=6d7f73f25e HTTP/1.0&quot; 200 4187 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:54 +0800] &quot;GET /assets/css/tomorrow.css?v=6d7f73f25e HTTP/1.0&quot; 200 610 &quot;http://xtrader.spartajet.com/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:54 +0800] &quot;GET /assets/css/animate.css HTTP/1.0&quot; 200 5066 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:55 +0800] &quot;GET /assets/js/main.js?v=6d7f73f25e HTTP/1.0&quot; 200 662 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">Nginx服务器的IP - - [03/Jan/2017:11:01:55 +0800] &quot;GET /assets/js/highlight.pack.js?v=6d7f73f25e HTTP/1.0&quot; 200 15760 &quot;http://xtrader.spartajet.com/&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div></pre></td></tr></table></figure>
+<p>可以看到，我的博客服务器上的日志只显示Nginx的IP和Nginx设置的域名，没有客户端的信息。</p>
+<p>#####Nginx代理服务器的日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">客户端IP - - [03/Jan/2017:11:01:55 +0800] &quot;GET /assets/js/highlight.pack.js?v=6d7f73f25e HTTP/1.1&quot; 200 15788 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">客户端IP - - [03/Jan/2017:11:01:58 +0800] &quot;GET /content/images/2016/10/logo.jpeg HTTP/1.1&quot; 200 42960 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">客户端IP - - [03/Jan/2017:11:02:13 +0800] &quot;GET /content/images/2016/10/e69ef0aa357bd34022b2824daf3b5a33_r-1.jpg HTTP/1.1&quot; 200 176528 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div><div class="line">客户端IP - - [03/Jan/2017:11:02:16 +0800] &quot;GET /assets/images/favicon.png HTTP/1.1&quot; 200 2562 &quot;设置的代理域名&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36&quot; &quot;-&quot;</div></pre></td></tr></table></figure>
+<p>代理服务器上的日志显示客户端的IP。</p>
+<h4 id="4-配置文件显示客户端IP"><a href="#4-配置文件显示客户端IP" class="headerlink" title="4.配置文件显示客户端IP"></a>4.配置文件显示客户端IP</h4><p>配置<code>guo.conf</code>文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen       80;</div><div class="line">    server_name  博客代理域名;</div><div class="line"></div><div class="line">    location / &#123;</div><div class="line">        proxy_pass http://www.guoxiaozhong.cn;</div><div class="line">        proxy_set_header            X-real-ip $remote_addr;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>主要是加上;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">proxy_set_header            X-real-ip $remote_addr;</div></pre></td></tr></table></figure>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Nginx </tag>
+            
+            <tag> 代理 </tag>
+            
+            <tag> 教程 </tag>
             
         </tags>
         
