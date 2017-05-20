@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="郭晓忠" />
+
+
+
+<meta name="description" content="NJ4X 源码源码阅读分析第三次，nj4x-ts源码深入分析">
+<meta name="keywords" content="NJ4X,源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析">
+<meta property="og:url" content="http://blog.spartajet.com/2017/05/20/2017-05-20-3/index.html">
+<meta property="og:site_name" content="郭晓忠的博客">
+<meta property="og:description" content="NJ4X 源码源码阅读分析第三次，nj4x-ts源码深入分析">
+<meta property="og:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-12-18-043426.jpg">
+<meta property="og:updated_time" content="2017-05-20T00:25:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析">
+<meta name="twitter:description" content="NJ4X 源码源码阅读分析第三次，nj4x-ts源码深入分析">
+<meta name="twitter:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-12-18-043426.jpg">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="郭晓忠的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/logo.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析 | 郭晓忠的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/logo.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">郭晓忠</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">机械男，程序员，前军校学员，穷逼博士。。。</p>
+        
+
+        
+
+
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/随笔">随笔</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:spartajet.guo@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/spartajet" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                                <a class="fa LinkedIn" href="https://www.linkedin.com/in/guoxiaozhong/" title="LinkedIn"></a>
+                            
+                                <a class="fa QQ" href="/1780273075" title="QQ"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">专注知识</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">郭晓忠</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/logo.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">郭晓忠</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">机械男，程序员，前军校学员，穷逼博士。。。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/随笔">随笔</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:spartajet.guo@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/spartajet" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                                <a class="fa LinkedIn" target="_blank" href="https://www.linkedin.com/in/guoxiaozhong/" title="LinkedIn"></a>
+                            
+                                <a class="fa QQ" target="_blank" href="/1780273075" title="QQ"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-2017-05-20-3" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/05/20/2017-05-20-3/" class="article-date">
+      <time datetime="2017-05-20T00:00:52.000Z" itemprop="datePublished">2017-05-20</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NJ4X/">NJ4X</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/源码分析/">源码分析</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="NJ4X源码阅读分析笔记系列（三）——-nj4x-ts深入分析"><a href="#NJ4X源码阅读分析笔记系列（三）——-nj4x-ts深入分析" class="headerlink" title="NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析"></a>NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析</h1><h2 id="一、系统的工作流程图（模块级）"><a href="#一、系统的工作流程图（模块级）" class="headerlink" title="一、系统的工作流程图（模块级）"></a>一、系统的工作流程图（模块级）</h2><p><img src="http://ghost.guoxiaozhong.cn/ghost/2016-12-18-043426.jpg" alt=""><br>其工作流程如下（以行情获取为例）：</p>
+<ol>
+<li>应用端向Application Server发起连接</li>
+<li>应用服务器调用jfx模块</li>
+<li>jfx模块与NJ4X Server中的nj4x-ts连接</li>
+<li>nj4x-ts调用mt4if模块</li>
+<li>mt4if模块与Application Server建立连接</li>
+<li>Application Server模块发起数据请求（行情，交易，订单等等）</li>
+<li>mt4if模块向MT4 Terminal请求数据</li>
+<li>MT4 Terminal向交易商节点请求数据</li>
+<li>交易商节点发送消息给MT4 Terminal</li>
+<li>MT4 Terminal将消息发送到mt4if</li>
+<li>mt4if将消息发送到Application Server的jfx中</li>
+<li>jfx将消息发送到server中</li>
+<li>server把数据发送到client中</li>
+</ol>
+<h2 id="二、NJ4X各个模块的作用"><a href="#二、NJ4X各个模块的作用" class="headerlink" title="二、NJ4X各个模块的作用"></a>二、NJ4X各个模块的作用</h2><p>这个是对之前分析的补充和纠正</p>
+<h3 id="1-mt4if"><a href="#1-mt4if" class="headerlink" title="1. mt4if"></a>1. mt4if</h3><p>这个是C++开发的模块主要作用如下：</p>
+<ul>
+<li>通讯连接（两种方式：一种是调用jvm，另一种是直接用UDP的Socket，目前是用jvm）</li>
+<li>Candle运算，系统默认的是1s,1min,5min,30min,其他的是根据需求计算的</li>
+<li>mt4 terminal的代理模块</li>
+<li>多线程的处理（稳定性）</li>
+</ul>
+<h3 id="2-nj4x-ts"><a href="#2-nj4x-ts" class="headerlink" title="2. nj4x-ts"></a>2. nj4x-ts</h3><p>这个是NJ4X终端服务器的java部分，作用如下：</p>
+<ul>
+<li>与Application Server通讯</li>
+<li>与mt4if交互，给mt4if发指令</li>
+<li>操作界面</li>
+<li>日志，存储等</li>
+</ul>
+<h3 id="3-jfx"><a href="#3-jfx" class="headerlink" title="3. jfx"></a>3. jfx</h3><p>这个模块是Application Server的组成部分，作用如下：</p>
+<ul>
+<li>与nj4x-ts交互</li>
+<li>与mt4if交互</li>
+<li>对MT4交易方式的封装</li>
+<li>对行情等信息的封装</li>
+</ul>
+<h3 id="4-ea"><a href="#4-ea" class="headerlink" title="4. ea"></a>4. ea</h3><p>这个是Expert Advisor模块，这个模块中只有两个文件，<code>jfx.mq4</code>和<code>wnds.mq4</code>，根据MQ4官网的说法，所有的交易策略和逻辑都是以.mq4文件形式存在的。MQ4确实有专家系统，但是貌似和这个关系不大。</p>
+<h3 id="5-zero-term"><a href="#5-zero-term" class="headerlink" title="5. zero-term"></a>5. zero-term</h3><p>这个模块存储着mt4 terminal的各种配置文件，根据货币，交易商的不同来给mt4 terminal生成不同的配置文件。</p>
+<h2 id="三-系统和MT4的交互方式"><a href="#三-系统和MT4的交互方式" class="headerlink" title="三 系统和MT4的交互方式"></a>三 系统和MT4的交互方式</h2><p>系统和MT4程序的交互主要是通过mt4if这个C++库的。mt4if这个模块提供了MT4程序的代理。体现在<code>ea</code>模块的<code>jfx.mq4</code>文件中.</p>
+<p>其中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">#import &quot;mt45if.dll&quot;</div><div class="line">string  jfxConnect(string, int, string, int, string);</div><div class="line">void    jfxDisconnect(string&amp;);</div><div class="line">int     jfxGetCommand(string&amp;, string&amp; p1, string&amp; p2, string&amp; p3, string&amp; p4, string&amp; p5, string&amp; p6, string&amp; p7, string&amp; p8, string&amp; p9, string&amp; p10, string&amp; p11, string&amp; p12, string&amp; p13, string&amp; p14, string&amp; p15);</div><div class="line">void    jfxSendResult(string&amp;, string&amp;);</div><div class="line">void    jfxLog(string&amp;);</div><div class="line">void    jfxHWnd(int, bool);</div><div class="line">void    jfxPositionInit(string&amp;, int);</div><div class="line">int     jfxPositionOrderInfo(string&amp;, int, int, int, int, int, int, int, string&amp;, string&amp;, double, double, double, double, double, double, double, double);</div><div class="line">string  jfxPositionRes(string&amp;, int, int);</div><div class="line">int     jfxMqlRatesInit(string&amp;);</div><div class="line">int     jfxMqlRatesAdd(string&amp;, MqlRates&amp; rates);</div><div class="line">string  jfxMqlRatesRes(string&amp;);</div><div class="line">#import</div></pre></td></tr></table></figure>
+<p>定义了调用mt4if的函数，这些函数帮助mt4 terminal与外界通讯。</p>
+<p>其中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">switch (x) &#123;</div><div class="line">    0:</div><div class="line">                    res = IntegerToString(iBars(args0,StrToInteger(args1)));</div><div class="line">                    if (maxDebug) Print(&quot;iBars&quot;, &quot;, &quot;, &quot;symbol=&quot;, args0,&quot;, &quot;, &quot;timeframe=&quot;, args1);</div><div class="line">                    break;</div><div class="line">    1:</div><div class="line">                    res = IntegerToString( iBarShift(args0,StrToInteger(args1),StrToTime(args2),StrToInteger(args3)) );</div><div class="line">                    if (maxDebug) Print(&quot;iBarShift&quot;, &quot;, &quot;, &quot;symbol=&quot;, args0,&quot;, &quot;, &quot;timeframe=&quot;, args1,&quot;, &quot;, &quot;time=&quot;, args2,&quot;, &quot;, &quot;exact=&quot;, args3);</div><div class="line">                    break;</div><div class="line">    2:</div><div class="line">                    res = DoubleToString( iClose(args0,StrToInteger(args1),StrToInteger(args2)) );</div><div class="line">                    if (maxDebug) Print(&quot;iClose&quot;, &quot;, &quot;, &quot;symbol=&quot;, args0,&quot;, &quot;, &quot;timeframe=&quot;, args1,&quot;, &quot;, &quot;shift=&quot;, args2);</div><div class="line">                    break;</div><div class="line">    3:</div><div class="line">                    res = DoubleToString( iHigh(args0,StrToInteger(args1),StrToInteger(args2)) );</div><div class="line">                    if (maxDebug) Print(&quot;iHigh&quot;, &quot;, &quot;, &quot;symbol=&quot;, args0,&quot;, &quot;, &quot;timeframe=&quot;, args1,&quot;, &quot;, &quot;shift=&quot;, args2);</div><div class="line">                    break;</div></pre></td></tr></table></figure>
+<p>以上代码就是判断通讯协议并作出不同的动作的代码</p>
+<p>可以修改jfx.mq4来调整自己的策略。</p>
+<h2 id="4-MT4-TERMINAL与外界的通讯协议"><a href="#4-MT4-TERMINAL与外界的通讯协议" class="headerlink" title="4. MT4 TERMINAL与外界的通讯协议"></a>4. MT4 TERMINAL与外界的通讯协议</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div></pre></td><td class="code"><pre><div class="line">0:&quot;iBars&quot;;</div><div class="line">1:&quot;iBarShift&quot;;</div><div class="line">2:&quot;iClose&quot;;</div><div class="line">3:&quot;iHigh&quot;;</div><div class="line">4:&quot;iLow&quot;;</div><div class="line">5:&quot;iOpen&quot;;</div><div class="line">6:&quot;iVolume&quot;;</div><div class="line">7:&quot;iTime&quot;;</div><div class="line">8:&quot;iLowest&quot;;</div><div class="line">9:&quot;iHighest&quot;;</div><div class="line">10:&quot;AccountBalance&quot;;</div><div class="line">11:&quot;AccountCredit&quot;;</div><div class="line">12:&quot;AccountCompany&quot;;</div><div class="line">13:&quot;AccountCurrency&quot;;</div><div class="line">14:&quot;AccountEquity&quot;;</div><div class="line">15:&quot;AccountFreeMargin&quot;;</div><div class="line">16:&quot;AccountMargin&quot;;</div><div class="line">17:&quot;AccountName&quot;;</div><div class="line">18:&quot;AccountNumber&quot;;</div><div class="line">19:&quot;AccountProfit&quot;;</div><div class="line">20:&quot;GetLastError&quot;;</div><div class="line">21:&quot;IsConnected&quot;;</div><div class="line">22:&quot;IsDemo&quot;;</div><div class="line">23:&quot;IsTesting&quot;;</div><div class="line">24:&quot;IsVisualMode&quot;;</div><div class="line">25:&quot;GetTickCount&quot;;</div><div class="line">26:&quot;Comment&quot;;</div><div class="line">27:&quot;MarketInfo&quot;;</div><div class="line">28:&quot;Print&quot;;</div><div class="line">29:&quot;Day&quot;;</div><div class="line">30:&quot;DayOfWeek&quot;;</div><div class="line">31:&quot;DayOfYear&quot;;</div><div class="line">32:&quot;Hour&quot;;</div><div class="line">33:&quot;Minute&quot;;</div><div class="line">34:&quot;Month&quot;;</div><div class="line">35:&quot;Seconds&quot;;</div><div class="line">36:&quot;TimeCurrent&quot;;</div><div class="line">37:&quot;Year&quot;;</div><div class="line">38:&quot;ObjectCreate&quot;;</div><div class="line">39:&quot;ObjectCreate&quot;;</div><div class="line">40:&quot;ObjectCreate&quot;;</div><div class="line">41:&quot;ObjectDelete&quot;;</div><div class="line">42:&quot;ObjectGet&quot;;</div><div class="line">43:&quot;ObjectSet&quot;;</div><div class="line">44:&quot;ObjectGetFiboDescription&quot;;</div><div class="line">45:&quot;ObjectSetFiboDescription&quot;;</div><div class="line">46:&quot;ObjectSetText&quot;;</div><div class="line">47:&quot;ObjectsTotal&quot;;</div><div class="line">48:&quot;ObjectType&quot;;</div><div class="line">49:&quot;iAC&quot;;</div><div class="line">50:&quot;iAD&quot;;</div><div class="line">51:&quot;iAlligator&quot;;</div><div class="line">52:&quot;iADX&quot;;</div><div class="line">53:&quot;iATR&quot;;</div><div class="line">54:&quot;iAO&quot;;</div><div class="line">55:&quot;iBearsPower&quot;;</div><div class="line">56:&quot;iBands&quot;;</div><div class="line">57:&quot;iBullsPower&quot;;</div><div class="line">58:&quot;iCCI&quot;;</div><div class="line">59:&quot;iCustom&quot;;</div><div class="line">60:&quot;iDeMarker&quot;;</div><div class="line">61:&quot;iEnvelopes&quot;;</div><div class="line">62:&quot;iForce&quot;;</div><div class="line">63:&quot;iFractals&quot;;</div><div class="line">64:&quot;iGator&quot;;</div><div class="line">65:&quot;iBWMFI&quot;;</div><div class="line">66:&quot;iMomentum&quot;;</div><div class="line">67:&quot;iMFI&quot;;</div><div class="line">68:&quot;iMA&quot;;</div><div class="line">69:&quot;iOsMA&quot;;</div><div class="line">70:&quot;iMACD&quot;;</div><div class="line">71:&quot;iOBV&quot;;</div><div class="line">72:&quot;iSAR&quot;;</div><div class="line">73:&quot;iRSI&quot;;</div><div class="line">74:&quot;iRVI&quot;;</div><div class="line">75:&quot;iStdDev&quot;;</div><div class="line">76:&quot;iStochastic&quot;;</div><div class="line">77:&quot;iWPR&quot;;</div><div class="line">78:&quot;OrderClose&quot;;</div><div class="line">79:&quot;OrderCloseBy&quot;;</div><div class="line">80:&quot;OrderClosePrice&quot;;</div><div class="line">81:&quot;OrderCloseTime&quot;;</div><div class="line">82:&quot;OrderComment&quot;;</div><div class="line">83:&quot;OrderCommission&quot;;</div><div class="line">84:&quot;OrderDelete&quot;;</div><div class="line">85:&quot;OrderExpiration&quot;;</div><div class="line">86:&quot;OrderLots&quot;;</div><div class="line">87:&quot;OrderMagicNumber&quot;;</div><div class="line">88:&quot;OrderModify&quot;;</div><div class="line">89:&quot;OrderOpenPrice&quot;;</div><div class="line">90:&quot;OrderOpenTime&quot;;</div><div class="line">91:&quot;OrderPrint&quot;;</div><div class="line">92:&quot;OrderProfit&quot;;</div><div class="line">93:&quot;OrderSelect&quot;;</div><div class="line">94:&quot;OrderSend&quot;;</div><div class="line">95:&quot;OrdersHistoryTotal&quot;;</div><div class="line">96:&quot;OrderStopLoss&quot;;</div><div class="line">97:&quot;OrdersTotal&quot;;</div><div class="line">98:&quot;OrderSwap&quot;;</div><div class="line">99:&quot;OrderSymbol&quot;;</div><div class="line">100:&quot;OrderTakeProfit&quot;;</div><div class="line">101:&quot;OrderTicket&quot;;</div><div class="line">102:&quot;OrderType&quot;;</div><div class="line">103:&quot;IsTradeContextBusy&quot;;</div><div class="line">104:&quot;RefreshRates&quot;;</div><div class="line">105:&quot;AccountStopoutLevel&quot;;</div><div class="line">106:&quot;AccountStopoutMode&quot;;</div><div class="line">107:&quot;MessageBox&quot;;</div><div class="line">108:&quot;UninitializeReason&quot;;</div><div class="line">109:&quot;IsTradeAllowed&quot;;</div><div class="line">110:&quot;IsStopped&quot;;</div><div class="line">111:&quot;IsOptimization&quot;;</div><div class="line">112:&quot;IsLibrariesAllowed&quot;;</div><div class="line">113:&quot;IsDllsAllowed&quot;;</div><div class="line">114:&quot;IsExpertEnabled&quot;;</div><div class="line">115:&quot;AccountFreeMarginCheck&quot;;</div><div class="line">116:&quot;AccountFreeMarginMode&quot;;</div><div class="line">117:&quot;AccountLeverage&quot;;</div><div class="line">118:&quot;AccountServer&quot;;</div><div class="line">119:&quot;TerminalCompany&quot;;</div><div class="line">120:&quot;TerminalName&quot;;</div><div class="line">121:&quot;TerminalPath&quot;;</div><div class="line">122:&quot;Alert&quot;;</div><div class="line">123:&quot;PlaySound&quot;;</div><div class="line">124:&quot;ObjectDescription&quot;;</div><div class="line">125:&quot;ObjectFind&quot;;</div><div class="line">126:&quot;ObjectGetShiftByValue&quot;;</div><div class="line">127:&quot;ObjectGetValueByShift&quot;;</div><div class="line">128:&quot;ObjectMove&quot;;</div><div class="line">129:&quot;ObjectName&quot;;</div><div class="line">130:&quot;ObjectsDeleteAll&quot;;</div><div class="line">131:&quot;iIchimoku&quot;;</div><div class="line">132:&quot;HideTestIndicators&quot;;</div><div class="line">133:&quot;Period&quot;;</div><div class="line">134:&quot;Symbol&quot;;</div><div class="line">135:&quot;WindowBarsPerChart&quot;;</div><div class="line">136:&quot;WindowFirstVisibleBar&quot;;</div><div class="line">137:&quot;WindowExpertName&quot;;</div><div class="line">138:&quot;WindowFind&quot;;</div><div class="line">139:&quot;WindowIsVisible&quot;;</div><div class="line">140:&quot;WindowPriceMax&quot;;</div><div class="line">141:&quot;WindowPriceMin&quot;;</div><div class="line">142:&quot;WindowOnDropped&quot;;</div><div class="line">143:&quot;WindowXOnDropped&quot;;</div><div class="line">144:&quot;WindowYOnDropped&quot;;</div><div class="line">145:&quot;WindowPriceOnDropped&quot;;</div><div class="line">146:&quot;WindowTimeOnDropped&quot;;</div><div class="line">147:&quot;WindowsTotal&quot;;</div><div class="line">148:&quot;WindowRedraw&quot;;</div><div class="line">149:&quot;WindowScreenShot&quot;;</div><div class="line">150:&quot;WindowHandle&quot;;</div><div class="line">151:&quot;GlobalVariableCheck&quot;;</div><div class="line">152:&quot;GlobalVariableDel&quot;;</div><div class="line">153:&quot;GlobalVariableGet&quot;;</div><div class="line">154:&quot;GlobalVariableName&quot;;</div><div class="line">155:&quot;GlobalVariableSet&quot;;</div><div class="line">156:&quot;GlobalVariableSetOnCondition&quot;;</div><div class="line">157:&quot;GlobalVariablesDeleteAll&quot;;</div><div class="line">158:&quot;GlobalVariablesTotal&quot;;</div><div class="line">159:&quot;SymbolsTotal&quot;;</div><div class="line">160:&quot;SymbolName&quot;;</div><div class="line">161:&quot;SymbolSelect&quot;;</div><div class="line">162:&quot;TerminalClose&quot;;</div><div class="line">163:&quot;SymbolInfo&quot;;</div><div class="line">164:&quot;AccountInfo&quot;;</div><div class="line">165:&quot;serverTimeGMTOffset&quot;;</div><div class="line">166:&quot;IsTradeAllowed&quot;;</div><div class="line">10000:&quot;SetAutoRefresh&quot;;</div><div class="line">10001:&quot;MarketInfoAll&quot;;</div><div class="line">10002:&quot;NewTick&quot;;</div><div class="line">10012:&quot;TicksListenerAll&quot;;</div><div class="line">10003:&quot;OrderGet&quot;;</div><div class="line">10004:&quot;NewPosition&quot;;</div><div class="line">10005:&quot;OrderGetAll&quot;;</div></pre></td></tr></table></figure>
+<p>这些协议大部分是mq4语言中的方法名，根据这些方法名就可以执行相应的方法，后面还有参数。</p>
+<p>有意思的是，为了解决这些方法的参数不同的问题，接收指令函数的参数有15个，应该是最长的那个函数的参数长度。如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jfxGetCommand(string&amp;, string&amp; p1, string&amp; p2, string&amp; p3, string&amp; p4, string&amp; p5, string&amp; p6, string&amp; p7, string&amp; p8, string&amp; p9, string&amp; p10, string&amp; p11, string&amp; p12, string&amp; p13, string&amp; p14, string&amp; p15);</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/05/20/2017-05-20-3/">NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">郭晓忠</a></p>
+        <p><span>发布时间:</span>2017-05-20, 02:00:52</p>
+        <p><span>最后更新:</span>2017-05-20, 02:25:16</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/05/20/2017-05-20-3/" title="NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析">http://blog.spartajet.com/2017/05/20/2017-05-20-3/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://blog.spartajet.com/2017/05/20/2017-05-20-3/　　作者: 郭晓忠" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2017/05/20/2017-05-20-2/">
+                    NJ4X源码阅读分析笔记系列（二）—— nj4x-ts初步分析
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/05/20/nginx-doc-01/">
+                    Nginx 最全小白实战教程之一 （安装篇）
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#NJ4X源码阅读分析笔记系列（三）——-nj4x-ts深入分析"><span class="toc-number">1.</span> <span class="toc-text">NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、系统的工作流程图（模块级）"><span class="toc-number">1.1.</span> <span class="toc-text">一、系统的工作流程图（模块级）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、NJ4X各个模块的作用"><span class="toc-number">1.2.</span> <span class="toc-text">二、NJ4X各个模块的作用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-mt4if"><span class="toc-number">1.2.1.</span> <span class="toc-text">1. mt4if</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-nj4x-ts"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. nj4x-ts</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-jfx"><span class="toc-number">1.2.3.</span> <span class="toc-text">3. jfx</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-ea"><span class="toc-number">1.2.4.</span> <span class="toc-text">4. ea</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-zero-term"><span class="toc-number">1.2.5.</span> <span class="toc-text">5. zero-term</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-系统和MT4的交互方式"><span class="toc-number">1.3.</span> <span class="toc-text">三 系统和MT4的交互方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-MT4-TERMINAL与外界的通讯协议"><span class="toc-number">1.4.</span> <span class="toc-text">4. MT4 TERMINAL与外界的通讯协议</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析　| 郭晓忠的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+        <section class="youyan" id="comments">
+    <script>
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = 'http://v2.uyan.cc/code/uyan.js?uid=2134017';
+            (d.head || d.body).appendChild(s);
+        }
+    </script>
+    
+    <script> loadComment(); </script>
+
+    <div id="uyan_frame"></div>
+</section>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/05/20/2017-05-20-2/" title="上一篇: NJ4X源码阅读分析笔记系列（二）—— nj4x-ts初步分析">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/05/20/nginx-doc-01/" title="下一篇: Nginx 最全小白实战教程之一 （安装篇）">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20/">Nginx 最全小白实战教程之三 （代理TCP篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/nginx-doc-02/">Nginx 最全小白实战教程之二 （代理篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20-1/">NJ4X源码阅读分析笔记系列（一）——项目整体分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20-2/">NJ4X源码阅读分析笔记系列（二）—— nj4x-ts初步分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20-3/">NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/nginx-doc-01/">Nginx 最全小白实战教程之一 （安装篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/spring-boot-sharding-jdbc/">springboot+sharding-jdbc+mybatis+mysql全注解实现增量数据库分片实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/19/hello-world/">Hello World</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2017 郭晓忠
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
