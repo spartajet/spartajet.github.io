@@ -3,6 +3,98 @@
   
     
     <entry>
+      <title><![CDATA[Nginx 最全小白实战教程之三 （代理TCP篇）]]></title>
+      <url>/2017/05/20/2017-05-20/</url>
+      <content type="html"><![CDATA[<blockquote>
+<p>Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。<br>我用它来代理Mysql。</p>
+</blockquote>
+<p>###一、配置代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">stream &#123;</div><div class="line">    upstream mysqls &#123;</div><div class="line">        hash $remote_addr consistent;</div><div class="line">        server 192.168.58.143:3306 weight=5 max_fails=3 fail_timeout=30s;</div><div class="line">        server 192.168.58.142:3306 weight=1 max_fails=3 fail_timeout=30s;</div><div class="line">    &#125;</div><div class="line">    server &#123;</div><div class="line">        listen 9945;</div><div class="line">        proxy_connect_timeout 1s;</div><div class="line">        proxy_timeout 3s;</div><div class="line">        proxy_pass mysqls;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个就是一个最基本的配置</p>
+<p>有几个注意的地方：</p>
+<ol>
+<li><code>stream</code>的配置必须是和<code>events</code>同级的，所以我直接就写在了<code>nginx.conf</code>主配置文件中的，这样就确保了和<code>events</code>同级。当然也可以单独写出来。</li>
+<li>这里的<code>server</code>里面是不准写<code>location</code>的，所以就不能判断<code>\sss\</code>这样的路径来做的。我开始的时候想这样的，模仿<code>spring</code>实现的<code>websocket</code>，后来才意识到，<code>websocket</code>可以这样是因为它连接是靠<code>http</code>协议的，传输才靠<code>tcp</code>的。终于明白了。</li>
+<li><code>server</code>的监听端口不能和<code>http</code>的重复。</li>
+<li>重新加载nginx时候可能会出现错误：<code>[emerg] 30181#0: bind() to 0.0.0.0:8090 failed (13: Permission denied)</code> 这个错误是由于<code>SElinux</code>，关掉这就好了。</li>
+<li>关闭<code>SElinux</code>方法：修改<code>/etc/selinux/config</code> 文件，将<code>SELINUX=enforcing</code>改为<code>SELINUX=disabled</code>重启之后就好了。</li>
+</ol>
+<h3 id="二、用法"><a href="#二、用法" class="headerlink" title="二、用法"></a>二、用法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">语法:	listen address:port [ssl] [udp] [proxy_protocol] [backlog=number] [bind] [ipv6only=on|off] [reuseport] [so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]];</div><div class="line">默认值: —</div><div class="line">上下文: server</div></pre></td></tr></table></figure>
+<p>设置方式可以是下面任意一种：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">listen 127.0.0.1:12345;</div><div class="line">listen *:12345;</div><div class="line">listen 12345;     # same as *:12345</div><div class="line">listen localhost:12345;</div></pre></td></tr></table></figure>
+<p>IPV6必须加上中括号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">listen [::1]:12345;</div><div class="line">listen [::]:12345;</div></pre></td></tr></table></figure>
+<p>UNIX-domain sockets要写<code>unix:</code> 前缀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">listen unix:/var/run/nginx.sock;</div></pre></td></tr></table></figure>
+<p><code>ssl</code><br>指定连接此端口的连接都是<code>SSL模式</code></p>
+<p><code>udp</code><br>用于处理套接字</p>
+<p><code>proxy_protocol</code><br>指定此端口上的所有连接都使用 <a href="http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt" target="_blank" rel="external">PROXY protocol</a>协议</p>
+<p><code>backlog=number</code><br>限制挂起连接队列的最大长度（1.9.2）。默认情况下，backlog在FreeBSD，DragonFly BSD和Mac OS X上设置为-1，在其他平台上设置为511。</p>
+<p><code>bind</code><br>表示对一个指定的<code>address:port</code>对进行单独的绑定。实是，如果有几个listen指令具有相同的端口但地址不同，并且其中一个listen指令监听给定端口<code>（\*：port）</code>的所有地址，nginx将只绑定<code>\*：port</code>。 应该注意，在这种情况下调用getsockname（）以确定接受连接的地址。 如果使用ipv6only或so_keepalive参数，那么对于给定的地址：端口对将始终进行单独的绑定。</p>
+<p><code>ipv6only=on|off</code><br>确定侦听通配符地址[::]的IPv6套接字是否只接受IPv6连接，或者是接受IPv6和IPv4连接。 此参数默认处于打开状态。 且它只能在启动时设置一次。</p>
+<p><code>so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]</code><br>此参数配置侦听套接字的<code>“TCP keepalive”</code>行为。 如果省略此参数，则操作系统的设置将对套接字生效。 如果将其设置为值“on”，则套接字的SO_KEEPALIVE选项将打开。 如果它设置为值“off”，则套接字的SO_KEEPALIVE选项被关闭。 某些操作系统支持使用TCP_KEEPIDLE，TCP_KEEPINTVL和TCP_KEEPCNT套接字选项在每个套接字上设置TCP保持活动参数。 在这些系统（目前，Linux 2.4+，NetBSD 5+和FreeBSD 9.0-STABLE）上，可以使用keepidle，keepintvl和keepcnt参数配置它们。 可以省略一个或两个参数，在这种情况下，相应套接字选项的系统默认设置将有效。 例如，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">so_keepalive=30m::10</div></pre></td></tr></table></figure>
+<h3 id="三、相关指令"><a href="#三、相关指令" class="headerlink" title="三、相关指令"></a>三、相关指令</h3><p>1.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的大小</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_buffer_size size;</div><div class="line">Default:	</div><div class="line">preread_buffer_size 16k;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>2.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的超时时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_timeout timeout;</div><div class="line">Default:	</div><div class="line">preread_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>3.指定完成读取代理协议头的超时时间，如果超过这个时间，就关闭连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	proxy_protocol_timeout timeout;</div><div class="line">Default:	</div><div class="line">proxy_protocol_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>4.配置用于将upstream servers中名称解析到地址的服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver address ... [valid=time] [ipv6=on|off];</div><div class="line">Default:	—</div><div class="line">Context:	stream, server</div><div class="line">This directive appeared in version 1.11.3.</div></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">resolver 127.0.0.1 [::1]:5353;</div><div class="line">resolver 127.0.0.1 [::1]:5353 valid=30s;</div></pre></td></tr></table></figure>
+<p>5.名字解析的超时时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver_timeout time;</div><div class="line">Default:	</div><div class="line">resolver_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>6.配置服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	server &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
+<p>7.配置stream服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	stream &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	main</div></pre></td></tr></table></figure>
+<p>8.配置是否允许<code>TCP_NODELAY</code>选项，这个可以用在客户端和代理服务器上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	tcp_nodelay on | off;</div><div class="line">Default:	</div><div class="line">tcp_nodelay on;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>9.设置变量的哈希表容量。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_bucket_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_bucket_size 64;</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
+<p>10.设置变量的哈希表最大容量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_max_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_max_size 1024;</div><div class="line">Context:	stream</div><div class="line">This directive appeared in version 1.11.2.</div></pre></td></tr></table></figure>
+<p>###四、相关变量</p>
+<ol>
+<li><code>$binary_remote_addr</code>：二进制形式的客户端地址，对于IPv4地址，值的长度始终为4字节，对于IPv6地址，值的长度始终为16字节</li>
+<li><code>$bytes_received</code>：从客户端接收到的字节数</li>
+<li><code>$bytes_sent</code>：发送到客户端的字节数</li>
+<li><code>$connection</code>：连接序列号</li>
+<li><code>$hostname</code>：host名称</li>
+<li><code>$msec</code>：当前时间(秒)，以毫秒为单位</li>
+<li><code>$nginx_version</code>：nginx版本</li>
+<li><code>$pid</code>：work process的pid</li>
+<li><code>$protocol</code>：和客户端通信的协议：TCP或者UDP</li>
+<li><code>$proxy_protocol_addr</code>：PROXY协议头中的客户端地址，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
+<li><code>$proxy_protocol_port</code>：PROXY协议头中的客户端端口，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
+<li><code>$remote_addr</code>：客户端地址</li>
+<li><code>$server_addr</code>：接收连接的服务器地址。<strong>计算此变量的值通常需要一次系统调用。 为了避免系统调用，listen指令必须指定地址并使用bind参数。</strong></li>
+<li><code>$server_port</code>：接收连接的服务器端口</li>
+<li><code>$session_time</code>：会话持续时间（秒），以毫秒为单位</li>
+<li><code>$time_iso8601</code>：ISO8610格式的本地时间</li>
+<li><code>$time_local</code>：通用日志格式的本地时间</li>
+<li><code>status</code>：状态值。200：会话完成；400：客户端数据无法解析，例如PROXY协议头；403：访问受限；500：内部服务器错误；502：网关错误；503：服务不可用。</li>
+</ol>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Nginx </tag>
+            
+            <tag> 代理 </tag>
+            
+            <tag> 教程 </tag>
+            
+            <tag> TCP </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Nginx 最全小白实战教程之二 （代理篇）]]></title>
       <url>/2017/05/20/nginx-doc-02/</url>
       <content type="html"><![CDATA[<h2 id="一、相关概念"><a href="#一、相关概念" class="headerlink" title="一、相关概念"></a>一、相关概念</h2><p>代理一般分为正向代理和反向代理，以下是他们的定义(以下内容引自网上)</p>

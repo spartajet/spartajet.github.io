@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="郭晓忠" />
+
+
+
+<meta name="description" content="Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。">
+<meta name="keywords" content="Nginx,代理,教程,TCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx 最全小白实战教程之三 （代理TCP篇）">
+<meta property="og:url" content="http://blog.spartajet.com/2017/05/20/2017-05-20/index.html">
+<meta property="og:site_name" content="郭晓忠的博客">
+<meta property="og:description" content="Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。">
+<meta property="og:updated_time" content="2017-05-20T00:16:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nginx 最全小白实战教程之三 （代理TCP篇）">
+<meta name="twitter:description" content="Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="郭晓忠的博客" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/logo.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Nginx 最全小白实战教程之三 （代理TCP篇） | 郭晓忠的博客</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/logo.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">郭晓忠</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">机械男，程序员，前军校学员，穷逼博士。。。</p>
+        
+
+        
+
+
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/随笔">随笔</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:spartajet.guo@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/spartajet" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                                <a class="fa LinkedIn" href="https://www.linkedin.com/in/guoxiaozhong/" title="LinkedIn"></a>
+                            
+                                <a class="fa QQ" href="/1780273075" title="QQ"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">专注知识</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">郭晓忠</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/logo.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">郭晓忠</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">机械男，程序员，前军校学员，穷逼博士。。。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/随笔">随笔</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:spartajet.guo@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/spartajet" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                                <a class="fa LinkedIn" target="_blank" href="https://www.linkedin.com/in/guoxiaozhong/" title="LinkedIn"></a>
+                            
+                                <a class="fa QQ" target="_blank" href="/1780273075" title="QQ"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-2017-05-20" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/05/20/2017-05-20/" class="article-date">
+      <time datetime="2017-05-20T00:00:52.000Z" itemprop="datePublished">2017-05-20</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Nginx 最全小白实战教程之三 （代理TCP篇）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Nginx/">Nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/TCP/">TCP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/代理/">代理</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/教程/">教程</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <blockquote>
+<p>Nginx代理TCP主要是使用stream模块，这个功能是从1.9.0版本开始的。<br>我用它来代理Mysql。</p>
+</blockquote>
+<p>###一、配置代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">stream &#123;</div><div class="line">    upstream mysqls &#123;</div><div class="line">        hash $remote_addr consistent;</div><div class="line">        server 192.168.58.143:3306 weight=5 max_fails=3 fail_timeout=30s;</div><div class="line">        server 192.168.58.142:3306 weight=1 max_fails=3 fail_timeout=30s;</div><div class="line">    &#125;</div><div class="line">    server &#123;</div><div class="line">        listen 9945;</div><div class="line">        proxy_connect_timeout 1s;</div><div class="line">        proxy_timeout 3s;</div><div class="line">        proxy_pass mysqls;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个就是一个最基本的配置</p>
+<p>有几个注意的地方：</p>
+<ol>
+<li><code>stream</code>的配置必须是和<code>events</code>同级的，所以我直接就写在了<code>nginx.conf</code>主配置文件中的，这样就确保了和<code>events</code>同级。当然也可以单独写出来。</li>
+<li>这里的<code>server</code>里面是不准写<code>location</code>的，所以就不能判断<code>\sss\</code>这样的路径来做的。我开始的时候想这样的，模仿<code>spring</code>实现的<code>websocket</code>，后来才意识到，<code>websocket</code>可以这样是因为它连接是靠<code>http</code>协议的，传输才靠<code>tcp</code>的。终于明白了。</li>
+<li><code>server</code>的监听端口不能和<code>http</code>的重复。</li>
+<li>重新加载nginx时候可能会出现错误：<code>[emerg] 30181#0: bind() to 0.0.0.0:8090 failed (13: Permission denied)</code> 这个错误是由于<code>SElinux</code>，关掉这就好了。</li>
+<li>关闭<code>SElinux</code>方法：修改<code>/etc/selinux/config</code> 文件，将<code>SELINUX=enforcing</code>改为<code>SELINUX=disabled</code>重启之后就好了。</li>
+</ol>
+<h3 id="二、用法"><a href="#二、用法" class="headerlink" title="二、用法"></a>二、用法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">语法:	listen address:port [ssl] [udp] [proxy_protocol] [backlog=number] [bind] [ipv6only=on|off] [reuseport] [so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]];</div><div class="line">默认值: —</div><div class="line">上下文: server</div></pre></td></tr></table></figure>
+<p>设置方式可以是下面任意一种：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">listen 127.0.0.1:12345;</div><div class="line">listen *:12345;</div><div class="line">listen 12345;     # same as *:12345</div><div class="line">listen localhost:12345;</div></pre></td></tr></table></figure>
+<p>IPV6必须加上中括号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">listen [::1]:12345;</div><div class="line">listen [::]:12345;</div></pre></td></tr></table></figure>
+<p>UNIX-domain sockets要写<code>unix:</code> 前缀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">listen unix:/var/run/nginx.sock;</div></pre></td></tr></table></figure>
+<p><code>ssl</code><br>指定连接此端口的连接都是<code>SSL模式</code></p>
+<p><code>udp</code><br>用于处理套接字</p>
+<p><code>proxy_protocol</code><br>指定此端口上的所有连接都使用 <a href="http://www.haproxy.org/download/1.5/doc/proxy-protocol.txt" target="_blank" rel="external">PROXY protocol</a>协议</p>
+<p><code>backlog=number</code><br>限制挂起连接队列的最大长度（1.9.2）。默认情况下，backlog在FreeBSD，DragonFly BSD和Mac OS X上设置为-1，在其他平台上设置为511。</p>
+<p><code>bind</code><br>表示对一个指定的<code>address:port</code>对进行单独的绑定。实是，如果有几个listen指令具有相同的端口但地址不同，并且其中一个listen指令监听给定端口<code>（\*：port）</code>的所有地址，nginx将只绑定<code>\*：port</code>。 应该注意，在这种情况下调用getsockname（）以确定接受连接的地址。 如果使用ipv6only或so_keepalive参数，那么对于给定的地址：端口对将始终进行单独的绑定。</p>
+<p><code>ipv6only=on|off</code><br>确定侦听通配符地址[::]的IPv6套接字是否只接受IPv6连接，或者是接受IPv6和IPv4连接。 此参数默认处于打开状态。 且它只能在启动时设置一次。</p>
+<p><code>so_keepalive=on|off|[keepidle]:[keepintvl]:[keepcnt]</code><br>此参数配置侦听套接字的<code>“TCP keepalive”</code>行为。 如果省略此参数，则操作系统的设置将对套接字生效。 如果将其设置为值“on”，则套接字的SO_KEEPALIVE选项将打开。 如果它设置为值“off”，则套接字的SO_KEEPALIVE选项被关闭。 某些操作系统支持使用TCP_KEEPIDLE，TCP_KEEPINTVL和TCP_KEEPCNT套接字选项在每个套接字上设置TCP保持活动参数。 在这些系统（目前，Linux 2.4+，NetBSD 5+和FreeBSD 9.0-STABLE）上，可以使用keepidle，keepintvl和keepcnt参数配置它们。 可以省略一个或两个参数，在这种情况下，相应套接字选项的系统默认设置将有效。 例如，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">so_keepalive=30m::10</div></pre></td></tr></table></figure>
+<h3 id="三、相关指令"><a href="#三、相关指令" class="headerlink" title="三、相关指令"></a>三、相关指令</h3><p>1.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的大小</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_buffer_size size;</div><div class="line">Default:	</div><div class="line">preread_buffer_size 16k;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>2.指定<a href="https://nginx.org/en/docs/stream/stream_processing.html#preread_phase" target="_blank" rel="external">preread</a> buffer的超时时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	preread_timeout timeout;</div><div class="line">Default:	</div><div class="line">preread_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>3.指定完成读取代理协议头的超时时间，如果超过这个时间，就关闭连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	proxy_protocol_timeout timeout;</div><div class="line">Default:	</div><div class="line">proxy_protocol_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>4.配置用于将upstream servers中名称解析到地址的服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver address ... [valid=time] [ipv6=on|off];</div><div class="line">Default:	—</div><div class="line">Context:	stream, server</div><div class="line">This directive appeared in version 1.11.3.</div></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">resolver 127.0.0.1 [::1]:5353;</div><div class="line">resolver 127.0.0.1 [::1]:5353 valid=30s;</div></pre></td></tr></table></figure>
+<p>5.名字解析的超时时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	resolver_timeout time;</div><div class="line">Default:	</div><div class="line">resolver_timeout 30s;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>6.配置服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	server &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
+<p>7.配置stream服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Syntax:	stream &#123; ... &#125;</div><div class="line">Default:	—</div><div class="line">Context:	main</div></pre></td></tr></table></figure>
+<p>8.配置是否允许<code>TCP_NODELAY</code>选项，这个可以用在客户端和代理服务器上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	tcp_nodelay on | off;</div><div class="line">Default:	</div><div class="line">tcp_nodelay on;</div><div class="line">Context:	stream, server</div></pre></td></tr></table></figure>
+<p>9.设置变量的哈希表容量。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_bucket_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_bucket_size 64;</div><div class="line">Context:	stream</div></pre></td></tr></table></figure>
+<p>10.设置变量的哈希表最大容量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Syntax:	variables_hash_max_size size;</div><div class="line">Default:	</div><div class="line">variables_hash_max_size 1024;</div><div class="line">Context:	stream</div><div class="line">This directive appeared in version 1.11.2.</div></pre></td></tr></table></figure>
+<p>###四、相关变量</p>
+<ol>
+<li><code>$binary_remote_addr</code>：二进制形式的客户端地址，对于IPv4地址，值的长度始终为4字节，对于IPv6地址，值的长度始终为16字节</li>
+<li><code>$bytes_received</code>：从客户端接收到的字节数</li>
+<li><code>$bytes_sent</code>：发送到客户端的字节数</li>
+<li><code>$connection</code>：连接序列号</li>
+<li><code>$hostname</code>：host名称</li>
+<li><code>$msec</code>：当前时间(秒)，以毫秒为单位</li>
+<li><code>$nginx_version</code>：nginx版本</li>
+<li><code>$pid</code>：work process的pid</li>
+<li><code>$protocol</code>：和客户端通信的协议：TCP或者UDP</li>
+<li><code>$proxy_protocol_addr</code>：PROXY协议头中的客户端地址，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
+<li><code>$proxy_protocol_port</code>：PROXY协议头中的客户端端口，或者为空字符串。<strong>必须先通过在listen指令中设置proxy_protocol参数才能启用PROXY协议。</strong></li>
+<li><code>$remote_addr</code>：客户端地址</li>
+<li><code>$server_addr</code>：接收连接的服务器地址。<strong>计算此变量的值通常需要一次系统调用。 为了避免系统调用，listen指令必须指定地址并使用bind参数。</strong></li>
+<li><code>$server_port</code>：接收连接的服务器端口</li>
+<li><code>$session_time</code>：会话持续时间（秒），以毫秒为单位</li>
+<li><code>$time_iso8601</code>：ISO8610格式的本地时间</li>
+<li><code>$time_local</code>：通用日志格式的本地时间</li>
+<li><code>status</code>：状态值。200：会话完成；400：客户端数据无法解析，例如PROXY协议头；403：访问受限；500：内部服务器错误；502：网关错误；503：服务不可用。</li>
+</ol>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/05/20/2017-05-20/">Nginx 最全小白实战教程之三 （代理TCP篇）</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">郭晓忠</a></p>
+        <p><span>发布时间:</span>2017-05-20, 02:00:52</p>
+        <p><span>最后更新:</span>2017-05-20, 02:16:47</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/05/20/2017-05-20/" title="Nginx 最全小白实战教程之三 （代理TCP篇）">http://blog.spartajet.com/2017/05/20/2017-05-20/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://blog.spartajet.com/2017/05/20/2017-05-20/　　作者: 郭晓忠" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/05/20/nginx-doc-02/">
+                    Nginx 最全小白实战教程之二 （代理篇）
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#二、用法"><span class="toc-number">1.</span> <span class="toc-text">二、用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、相关指令"><span class="toc-number">2.</span> <span class="toc-text">三、相关指令</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Nginx 最全小白实战教程之三 （代理TCP篇）　| 郭晓忠的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+        <section class="youyan" id="comments">
+    <script>
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = 'http://v2.uyan.cc/code/uyan.js?uid=2134017';
+            (d.head || d.body).appendChild(s);
+        }
+    </script>
+    
+    <script> loadComment(); </script>
+
+    <div id="uyan_frame"></div>
+</section>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/05/20/nginx-doc-02/" title="下一篇: Nginx 最全小白实战教程之二 （代理篇）">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/2017-05-20/">Nginx 最全小白实战教程之三 （代理TCP篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/nginx-doc-02/">Nginx 最全小白实战教程之二 （代理篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/nginx-doc-01/">Nginx 最全小白实战教程之一 （安装篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/20/spring-boot-sharding-jdbc/">springboot+sharding-jdbc+mybatis+mysql全注解实现增量数据库分片实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/05/19/hello-world/">Hello World</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2017 郭晓忠
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
