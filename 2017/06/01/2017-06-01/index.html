@@ -15,22 +15,17 @@
 
 
 
-<meta name="description" content="NJ4X 源码源码阅读分析第一次，系统分析">
-<meta name="keywords" content="NJ4X,源码分析">
+<meta name="description" content="时空复杂度的学习笔记">
+<meta name="keywords" content="算法,时空复杂度">
 <meta property="og:type" content="article">
-<meta property="og:title" content="NJ4X源码阅读分析笔记系列（一）——项目整体分析">
-<meta property="og:url" content="http://blog.spartajet.com/2017/05/20/2017-05-20-1/index.html">
+<meta property="og:title" content="时空复杂度">
+<meta property="og:url" content="http://blog.spartajet.com/2017/06/01/2017-06-01/index.html">
 <meta property="og:site_name" content="郭晓忠的博客">
-<meta property="og:description" content="NJ4X 源码源码阅读分析第一次，系统分析">
-<meta property="og:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-063804.jpg">
-<meta property="og:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-064028.jpg">
-<meta property="og:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-064054.jpg">
-<meta property="og:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-073708.jpg">
-<meta property="og:updated_time" content="2017-05-20T00:23:02.000Z">
+<meta property="og:description" content="时空复杂度的学习笔记">
+<meta property="og:updated_time" content="2017-06-01T09:26:21.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NJ4X源码阅读分析笔记系列（一）——项目整体分析">
-<meta name="twitter:description" content="NJ4X 源码源码阅读分析第一次，系统分析">
-<meta name="twitter:image" content="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-063804.jpg">
+<meta name="twitter:title" content="时空复杂度">
+<meta name="twitter:description" content="时空复杂度的学习笔记">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -62,7 +57,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>NJ4X源码阅读分析笔记系列（一）——项目整体分析 | 郭晓忠的博客</title>
+<title>时空复杂度 | 郭晓忠的博客</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -220,11 +215,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-2017-05-20-1" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-2017-06-01" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2017/05/20/2017-05-20-1/" class="article-date">
-      <time datetime="2017-05-20T00:00:52.000Z" itemprop="datePublished">2017-05-20</time>
+      <a href="/2017/06/01/2017-06-01/" class="article-date">
+      <time datetime="2017-06-01T00:00:52.000Z" itemprop="datePublished">2017-06-01</time>
 </a>
 
 
@@ -239,7 +234,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      NJ4X源码阅读分析笔记系列（一）——项目整体分析
+      时空复杂度
     </h1>
   
 
@@ -250,7 +245,7 @@
 
         
     <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NJ4X/">NJ4X</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/源码分析/">源码分析</a></li></ul>
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/时空复杂度/">时空复杂度</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/算法/">算法</a></li></ul>
     </div>
 
         <div class="clearfix"></div>
@@ -260,41 +255,66 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h1 id="NJ4X源码阅读分析笔记系列（一）——项目整体分析"><a href="#NJ4X源码阅读分析笔记系列（一）——项目整体分析" class="headerlink" title="NJ4X源码阅读分析笔记系列（一）——项目整体分析"></a>NJ4X源码阅读分析笔记系列（一）——项目整体分析</h1><h2 id="NJ4X是什么"><a href="#NJ4X是什么" class="headerlink" title="NJ4X是什么"></a>NJ4X是什么</h2><p>参见NJ4X的官网：<a href="http://www.nj4x.com/" target="_blank" rel="external">http://www.nj4x.com/</a></p>
-<blockquote>
-<p>Java and .Net interfaces to supported Forex brokers in a legal and robust way.</p>
-<p>这个NJ4X是个乌克兰人写的，代码风格相当彪悍，不愧是战斗民族。</p>
-</blockquote>
-<p><img src="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-063804.jpg" alt=""><br>大题的架构图如下：<br><img src="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-064028.jpg" alt=""><br><img src="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-064054.jpg" alt=""></p>
-<p>##本文研究的NJ4X版本<br>2.6.2</p>
-<p>##NJ4X的整体架构<br>NJ4X由以下六部分组成：</p>
-<ul>
-<li><strong>mt4if</strong> MT4语言的C++接口（MT4 Interface DLL）</li>
-<li><strong>nj4x-ts</strong> NJ4X终端服务器(NJ4X Terminal Server)</li>
-<li><strong>jfx</strong> MT4 终端API，JAVA版（JFX MT4 Terminal API for Java）</li>
-<li><strong>nj4x</strong> MT4 终端API，.NET版 (NJ4X MT4 Terminal API for .Net)</li>
-<li><strong>ea</strong> 专家系统 (JFX Expert Advisor)</li>
-<li><strong>zero-term</strong> 具体不明，不知道是干什么，后期有时间会分析。<br>##运行系统要求<br>官方推荐用<strong>windows</strong>，因为有C++的库。但是看Q&amp;A上面也有说可以在<code>Linux</code>下运行的，原理是采用<strong>WINE</strong>，我没有试过，有兴趣的可以自己去试试。MAC下也可以使用WINE，我没有试过。</li>
-</ul>
-<p>参见：<a href="http://www.nj4x.com/faqs" target="_blank" rel="external">How can I run Terminal Server on WINE (Linux)?</a></p>
-<p>##用到的工具</p>
-<ul>
-<li><strong>JDK1.7以上</strong> 我用的是1.8</li>
-<li><strong>Visual Studio2013以上</strong> 我用的是2015</li>
-<li><strong>Maven</strong> 3.3.9</li>
-<li><strong>Nuget.exe</strong> 这个要说一下，现在的vs自带nuget，但是我不知道nuget的具体目录，只能单独下载一个。</li>
-<li><strong>launch4j</strong> 这个是把jar可执行程序转换为exe的。</li>
-<li><strong>7Zip</strong> 负责解压的，用来解压zrv</li>
-</ul>
-<p>##项目转换</p>
-<p>其中<strong>mt4if</strong>，<strong>nj4x</strong>这两个项目需要在VS转换为本地VS能够处理的。<strong>mt4if</strong>是<code>C++</code>写的，<strong>nj4x</strong>是<code>C#</code>写的。</p>
-<p>转换的话就是在VS中打开，然后按照提示操作就行了，和我们用高版本VS打开低版本的VS开发的项目是一样的。</p>
-<p><strong>记住，转换之后就可以关闭VS了，VS可以歇菜了，不要用VS编译项目</strong></p>
-<p>##项目编译<br>首先在项目根目录下的<code>pom.xml</code>中设置好所需工具的路径，设置成为你自己的路径。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;zip7&gt;C:\Program Files\7-Zip\7z.exe&lt;/zip7&gt;</div><div class="line">&lt;devenv&gt;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe&lt;/devenv&gt;</div><div class="line">&lt;mstest&gt;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\MSTest.exe&lt;/mstest&gt;</div><div class="line">&lt;launch4j.dir&gt;C:\Program Files (x86)\Launch4j&lt;/launch4j.dir&gt;</div></pre></td></tr></table></figure>
-<p>首先进入<code>mt4if</code>模块中，<code>mvn pacakge</code>编译好C++库。然后就可以在编译你需要的模块了。</p>
-<p>如果想编译整个项目，就在根目录下<code>mvn pacakge</code>，但是容易出错，你要重试好多次，过程比较麻烦。</p>
-<p>最后，项目如图所示：<br><img src="http://ghost.guoxiaozhong.cn/ghost/2016-11-27-073708.jpg" alt=""></p>
+        <h2 id="面试求职班一笔记"><a href="#面试求职班一笔记" class="headerlink" title="面试求职班一笔记"></a>面试求职班一笔记</h2><ol>
+<li>算法主要研究：时空复杂度</li>
+<li><p>算法的特征：</p>
+<pre><code>1. 有穷性，
+2. 确定性，
+3. 可行性，
+4. 可能没有输入，但一定有输出
+</code></pre></li>
+<li><p>常用算法</p>
+<pre><code>1. 穷举法（eg：求N个数的全排列；8皇后问题）
+2. 减而治之（二分查找——减而治之；归并排序——分而治之）
+3. 贪心算法（最小生成树；单源最短路）所谓贪心算法是指，在对问题求解时，总是做出在当前看来是最好的选择。也就是说，不从整体最优上加以考虑，他所做出的仅是在某种意义上的局部最优解。
+4. 动态规划（背包；士兵路径）
+</code></pre></li>
+<li><p>复杂度</p>
+<pre><code>1. 谈算法一定要考虑复杂度
+2. 时间复杂度和空间复杂度
+    1. 时间复杂度：计算机基本操作的次数（汇编指令的条数）+ - * / % 寻址 跳转
+    2. 空间复杂度：所需占用的内存字节数
+    3. 两者区别：空间是可以返回利用的。
+    4. 表示方法：O(n) 忽略常数（高阶无穷小）注意：算法复杂度是考虑算法最坏情况时的复杂度
+    5. eg: 快速排序的复杂度 O(n^2)，这个就是他的最坏情况
+3. 常见的复杂度
+    1. O(1): 基本运算 + - * / % 寻址  跳转
+    2. O(logN): 二分查找
+    3. O(N^(1/2)): 枚举约数
+    4. O(N): 线性查找
+    5. O(N^2): 朴素最近带你对
+    6. O(N^3): Floyd最短路；普通矩阵乘法
+    7. O(NlogN): 归并排序；快速排序的期望复杂度；基于比较排序的算法下界
+</code></pre></li>
+</ol>
+<p>$$a_1,a_2,…a_n    排序全排列的时间复杂度为 n!$$<br>$$当a_i&lt;a<em>j时$$<br>$$复杂度变为: \frac{n!}{2}$$<br>$$当有k个关系时，每次都能排除一般的可能$$<br>$$复杂度为: \frac{n!}{2^k}$$<br>$$令: \frac{n!}{2^k} = 1  即 n!=2^k$$<br>$$k=\log</em>{2}{n!} &lt; \log<em>{2}{n^n}=n\log</em>{2}{n}=n\frac{\log n}{\log2}&lt; n\log{n}$$<br>以上为推导过程</p>
+<pre><code>8. O(2^N): 枚举全部的子集   注意：一个集合全部子集的数量是2^N
+9. O(N!): 枚举全部排列
+总结: 
+    1. 优秀算法排序：
+</code></pre><p>$$O(1) &lt; O(\log{n}) &lt; O(\sqrt{n} &lt; O(n) &lt; O(n\log{n}))$$</p>
+<pre><code>2. 可以优化的：
+</code></pre><p>$$O(n^2)&lt;O(n^3)&lt;O(2^n)&lt;O(n!)$$</p>
+<pre><code>3. 算法估计，计算机1s能运算1亿条指令，注意以下数字
+</code></pre><p>$$(1000)^2=1亿; (465)^3=100,544,625; 12!=479001600$$</p>
+<pre><code>5. 常用的时间复杂度分析方法
+    1. 输入输出
+        1. N个数组求和，时间复杂度下限为: O(n)
+        2. 输出全排列的复杂度在O(n!)以上
+    2. 循环次数
+        eg: 循环嵌套的复杂度至少是O(n^2)
+        for(i...n)
+            for(i...n)
+
+    3. 均摊分析法
+        多个操作一起计算时间复杂度
+        eg1: MULTIPOP的队列，可以一次性出队k个元素，但每个元素出入队列只能有一次
+        eg2: 动态数据尾部插入操作（C++中是vector，java中是ArrayList）
+        一旦元素超过容量限制，则重新扩大并分配空间，将旧数据复制到新的内存地址上。
+        有空间的情况下复杂度是O(1)
+        空间满了再扩大的时候的复杂度是O(n)
+        重新分配k次的复杂度是O(2^n)
+</code></pre><p>$$O(1)+O(2)+O(4)+…+O(2^n)=O(2^n-1)$$</p>
 
       
     </div>
@@ -303,13 +323,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2017/05/20/2017-05-20-1/">NJ4X源码阅读分析笔记系列（一）——项目整体分析</a></p>
+        <p><span>本文标题:</span><a href="/2017/06/01/2017-06-01/">时空复杂度</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">郭晓忠</a></p>
-        <p><span>发布时间:</span>2017-05-20, 02:00:52</p>
-        <p><span>最后更新:</span>2017-05-20, 02:23:02</p>
+        <p><span>发布时间:</span>2017-06-01, 02:00:52</p>
+        <p><span>最后更新:</span>2017-06-01, 11:26:21</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2017/05/20/2017-05-20-1/" title="NJ4X源码阅读分析笔记系列（一）——项目整体分析">http://blog.spartajet.com/2017/05/20/2017-05-20-1/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://blog.spartajet.com/2017/05/20/2017-05-20-1/　　作者: 郭晓忠" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2017/06/01/2017-06-01/" title="时空复杂度">http://blog.spartajet.com/2017/06/01/2017-06-01/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://blog.spartajet.com/2017/06/01/2017-06-01/　　作者: 郭晓忠" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -321,16 +341,10 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2017/06/01/2017-06-01/">
-                    时空复杂度
-                </a>
-            </div>
-        
         
             <div id="article-nav-older" class="article-nav-title">
-                <a href="/2017/05/20/2017-05-20-3/">
-                    NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析
+                <a href="/2017/05/20/2017-05-20-1/">
+                    NJ4X源码阅读分析笔记系列（一）——项目整体分析
                 </a>
             </div>
         
@@ -342,7 +356,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#NJ4X源码阅读分析笔记系列（一）——项目整体分析"><span class="toc-number">1.</span> <span class="toc-text">NJ4X源码阅读分析笔记系列（一）——项目整体分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#NJ4X是什么"><span class="toc-number">1.1.</span> <span class="toc-text">NJ4X是什么</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#面试求职班一笔记"><span class="toc-number">1.</span> <span class="toc-text">面试求职班一笔记</span></a></li></ol>
         
     </div>
     <style>
@@ -378,7 +392,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"NJ4X源码阅读分析笔记系列（一）——项目整体分析　| 郭晓忠的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"时空复杂度　| 郭晓忠的博客　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -412,15 +426,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2017/06/01/2017-06-01/" title="上一篇: 时空复杂度">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/2017/05/20/2017-05-20-3/" title="下一篇: NJ4X源码阅读分析笔记系列（三）—— nj4x-ts深入分析">
+            <a href="/2017/05/20/2017-05-20-1/" title="下一篇: NJ4X源码阅读分析笔记系列（一）——项目整体分析">
                 <i class="fa fa-angle-right"></i>
             </a>
         
